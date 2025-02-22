@@ -39,6 +39,12 @@
  Screenshots
 </summary> <br />
 
+<p align="center">
+    <img width="49%" src="https://github.com/user-attachments/assets/4ec9ebd6-e202-4a22-84da-387db792ba80" alt="Screenshot 1"/>
+&nbsp;
+    <img width="49%" src="https://github.com/user-attachments/assets/4ec9ebd6-e202-4a22-84da-387db792ba80" alt="Screenshot 2"/>
+</p>
+
 </details>
 
 ## Usage
