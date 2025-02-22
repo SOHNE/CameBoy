@@ -1,3 +1,4 @@
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/logo.svg">
   <img alt="LeveGL Logo" src="./.github/assets/logo.svg" width="100px" align="left">
@@ -39,11 +40,24 @@
  Screenshots
 </summary> <br />
 
-<p align="center">
-    <img width="49%" src="https://github.com/user-attachments/assets/4ec9ebd6-e202-4a22-84da-387db792ba80" alt="Screenshot 1"/>
-&nbsp;
-    <img width="49%" src="https://github.com/user-attachments/assets/4ec9ebd6-e202-4a22-84da-387db792ba80" alt="Screenshot 2"/>
-</p>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img width="100%" src="https://github.com/user-attachments/assets/4ec9ebd6-e202-4a22-84da-387db792ba80" alt="Screenshot 1"/><br>
+      <sub>Caption for Screenshot 1</sub>
+    </td>
+    <td align="center">
+      <img width="100%" src="https://github.com/user-attachments/assets/4ec9ebd6-e202-4a22-84da-387db792ba80" alt="Screenshot 2"/><br>
+      <sub>Caption for Screenshot 2</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"> <img width="100%" src="https://github.com/user-attachments/assets/4ec9ebd6-e202-4a22-84da-387db792ba80" alt="Screenshot 3"/><br>
+      <sub>Caption for Screenshot 3</sub> </td>
+    <td align="center"> <img width="100%" src="https://github.com/user-attachments/assets/4ec9ebd6-e202-4a22-84da-387db792ba80" alt="Screenshot 4"/><br>
+      <sub>Caption for Screenshot 4</sub> </td>
+  </tr>
+</table>
 
 </details>
 
@@ -58,4 +72,3 @@
 ## License
 
 ---
-
