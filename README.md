@@ -20,6 +20,10 @@
   <a href="#">
     Live Demo
   </a>
+  •
+  <a href="#">
+    Project Notes 🇧🇷
+  </a>
 </div>
 
 ## Introduction
