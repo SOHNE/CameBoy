@@ -8,7 +8,7 @@
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/SOHNE/gbCEmu?style=flat)](https://github.com/SOHNE/gbCEmu/releases/latest)
 [![License](https://img.shields.io/github/license/SOHNE/gbCEmu?style=flat)](https://github.com/SOHNE/gbCEmu/blob/main/LICENSE)
-<!--[![gbCEmu Examples builds](https://github.com/SOHNE/gbCEmu/actions/workflows/build.yml/badge.svg?branch=stable)](https://github.com/SOHNE/gbCEmu/actions/workflows/build.yml)-->
+[![Standalone](https://github.com/SOHNE/gbCEmu/actions/workflows/standalone.yml/badge.svg)](https://github.com/SOHNE/gbCEmu/actions/workflows/standalone.yml)
 
 
 ✨ Learning by doing: Exploring the fundamentals of emulation with a minimalist Game Boy™ project. 🎮
