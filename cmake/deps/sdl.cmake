@@ -1,5 +1,6 @@
 if(NOT DEFINED EMSCRIPTEN)
-  find_package(SDL2 QUIET)
+  find_package(SDL2 QUIET CONFIG REQUIRED COMPONENTS SDL2)
+  find_package(SDL2 QUIET CONFIG COMPONENTS SDL2main)
 
   if(NOT SDL2_FOUND)
     message(STATUS "System SDL2 not found, fetching using CPM...")
@@ -11,8 +12,6 @@ if(NOT DEFINED EMSCRIPTEN)
       GIT_TAG release-2.32.0
       OPTIONS
         "SDL_EXAMPLES OFF"
-        "SDL_SHARED OFF"
-        "SDL_STATIC ON"
         "SDL_TESTS OFF"
     )
 

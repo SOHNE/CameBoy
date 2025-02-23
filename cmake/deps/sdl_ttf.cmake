@@ -11,10 +11,6 @@ if(NOT DEFINED EMSCRIPTEN)
       GIT_TAG release-2.24.0
       OPTIONS
         "SDL_EXAMPLES OFF"
-        "SDL_SHARED OFF"
-        "SDL_STATIC ON"
-        "SDL_STATIC_PIC ON"
-        "SDL_WERROR OFF"
     )
 
     if(NOT SDL_ttf_ADDED)
