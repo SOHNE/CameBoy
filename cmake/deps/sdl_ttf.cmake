@@ -29,7 +29,7 @@ if(NOT DEFINED EMSCRIPTEN)
   endif()
 
   # Add SDL2_ttf link target regardless of how it was obtained
-  list(APPEND LEVE_DEPS_LINK
+  list(APPEND GBE_DEPS_LINK
     $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>
   )
 endif()
