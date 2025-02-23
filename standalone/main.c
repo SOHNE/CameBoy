@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     }
     
     // Create window
-    window = SDL_CreateWindow("Scaled Pixel Display",
+    window = SDL_CreateWindow("gbCEmu",
                             SDL_WINDOWPOS_UNDEFINED,
                             SDL_WINDOWPOS_UNDEFINED,
                             SCREEN_WIDTH * SCALE_FACTOR,

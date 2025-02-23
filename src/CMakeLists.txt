@@ -1,21 +1,21 @@
 #--------------------------------------------------------------------
 # Source and Header Files
 #--------------------------------------------------------------------
-set(GBE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/gbEmu)
+set(GBE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/gbCEmu)
 set(GBE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
 list(APPEND GBE_HEADER_FILES
-
+    ${GBE_INCLUDE_DIR}/gbCEmu.h
 )
 
 list(APPEND GBE_SOURCE_FILES
-    ${GBE_SOURCE_DIR}/main.c
+    ${GBE_SOURCE_DIR}/emu.c
 )
 
 #--------------------------------------------------------------------
 # Library Setup
 #--------------------------------------------------------------------
-add_executable(${PROJECT_NAME} ${GBE_SOURCE_FILES} ${GBE_HEADER_FILES})
+add_library(${PROJECT_NAME} ${GBE_HEADER_FILES} ${GBE_SOURCE_FILES})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE ${GBE_DEPS_LINK})
@@ -36,6 +36,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME}
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
   PRIVATE
     ${GBE_DEPS_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -47,6 +48,8 @@ target_include_directories(${PROJECT_NAME}
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
         PUBLIC_HEADER "${GBE_HEADER_FILES}"
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
         C_EXTENSIONS OFF
         C_STANDARD 99
         C_STANDARD_REQUIRED ON

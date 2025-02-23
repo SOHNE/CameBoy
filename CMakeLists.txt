@@ -4,7 +4,7 @@ project(
   VERSION 0.0.1
   DESCRIPTION "A simple Game Boy™ Emulator"
   LANGUAGES C
-  HOMEPAGE_URL "https://github.com/SOHNE/gbEmu"
+  HOMEPAGE_URL "https://github.com/SOHNE/gbCEmu"
 )
 
 # Determine if LuGL is the main project
@@ -36,8 +36,9 @@ message(STATUS "> CPM.cmake")
 include(cmake/CPM.cmake)
 CPMUsePackageLock(package-lock.cmake)
 
-CPMAddPackage("gh:cpm-cmake/CPMLicenses.cmake@0.0.7")
+CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.13.0")
 CPMAddPackage("gh:TheLartians/GroupSourcesByFolder.cmake@1.0")
+CPMAddPackage("gh:cpm-cmake/CPMLicenses.cmake@0.0.7")
 
 include(cmake/tools.cmake)
 
@@ -55,7 +56,29 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # --------------------------------------------------------------------
 # Subdirectories
 # --------------------------------------------------------------------
-add_subdirectory(src gbemu)
+add_subdirectory(src gbCEmu)
+
+# --------------------------------------------------------------------
+# Installation Configuration
+# --------------------------------------------------------------------
+string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
+string(TOLOWER ${PROJECT_NAME}/export.h EXPORT_HEADER_LOCATION)
+
+packageProject(
+  NAME ${PROJECT_NAME}
+  VERSION ${PROJECT_VERSION}
+  NAMESPACE ${PROJECT_NAME}
+  BINARY_DIR ${PROJECT_BINARY_DIR}
+  INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include
+  INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
+  VERSION_HEADER "${VERSION_HEADER_LOCATION}"
+  EXPORT_HEADER "${EXPORT_HEADER_LOCATION}"
+  COMPATIBILITY SameMajorVersion
+  DEPENDENCIES "Ccache 1.2.5;SDL release-2.32.0;SDL_ttf release-2.24.0"
+)
+
+unset(VERSION_HEADER_LOCATION)
+unset(EXPORT_HEADER_LOCATION)
 
 # --------------------------------------------------------------------
 # License collector
