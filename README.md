@@ -22,7 +22,7 @@
     Live Demo
   </a>
   •
-  <a href="#">
+  <a href="https://leandroperes.notion.site/Game-Boy-C-Emulator-1a2d6f68a3ab8093a418fff30b2c236b">
     Project Notes 🇧🇷
   </a>
 </div>
