@@ -1,6 +1,3 @@
-# --------------------------------------------------------------------
-# Project Setup
-# --------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.26)
 project(gbCEmuTests LANGUAGES C)
 
@@ -9,6 +6,8 @@ project(gbCEmuTests LANGUAGES C)
 # --------------------------------------------------------------------
 option(ENABLE_TEST_COVERAGE "Enable test coverage" OFF)
 option(TEST_INSTALLED_VERSION "Test the version found by find_package" OFF)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # --------------------------------------------------------------------
 # Include External CMake Scripts
@@ -22,12 +21,14 @@ include(../cmake/tools.cmake)
 CPMAddPackage("gh:TheLartians/GroupSourcesByFolder.cmake@1.0")
 
 CPMAddPackage(
-  NAME Tau
-  URL https://github.com/jasmcaus/tau/archive/refs/heads/dev.zip
-  # URL_HASH 55f126525c4422b59b583c412dab38b3488a9e15e37e23d661d0612342662e24
-  OPTIONS
-    "TAU_BUILDINTERNALTESTS OFF"
+  NAME Check
+  URL https://github.com/libcheck/check/releases/download/0.15.2/check-0.15.2.tar.gz
+  URL_HASH SHA256=a8de4e0bacfb4d76dd1c618ded263523b53b85d92a146d8835eb1a52932fa20a
 )
+
+if(NOT Check_ADDED)
+  message(FATAL_ERROR "Could not add libcheck/check")
+endif()
 
 if(TEST_INSTALLED_VERSION)
   find_package(gbCEmu REQUIRED)
@@ -36,18 +37,39 @@ else()
 endif()
 
 # --------------------------------------------------------------------
-# Target Definition
+# Test Sources
 # --------------------------------------------------------------------
 set(UNIT_TESTS_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_gbce.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_gbce.c
 )
 
-add_executable(${PROJECT_NAME} ${UNIT_TESTS_SOURCES})
+# --------------------------------------------------------------------
+# Enable Testing
+# --------------------------------------------------------------------
+enable_testing()
 
-target_link_libraries(${PROJECT_NAME} Tau gbCEmu::gbCEmu)
+foreach(test_src IN LISTS UNIT_TESTS_SOURCES)
+  # Get test name
+  get_filename_component(test_name ${test_src} NAME_WE)
+
+  # Create test
+  add_executable(${test_name} ${test_src})
+  target_link_libraries(${test_name} PRIVATE gbCEmu::gbCEmu Check::check)
+
+  # Add the test to CTest
+  add_test(NAME ${test_name} COMMAND ${test_name})
+  set_tests_properties(${test_name} PROPERTIES TIMEOUT 30)
+
+  if(ENABLE_TEST_COVERAGE)
+    target_compile_options(${test_name} PRIVATE -O0 -g -fprofile-arcs -ftest-coverage)
+    target_link_options(${test_name} PRIVATE -fprofile-arcs -ftest-coverage)
+  endif()
+
+  GroupSourcesByFolder(${test_name})
+endforeach()
 
 # --------------------------------------------------------------------
-# Compiler Options
+# Global Compiler Options
 # --------------------------------------------------------------------
 if(NOT TEST_INSTALLED_VERSION)
   if(CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "GNU")
@@ -56,22 +78,3 @@ if(NOT TEST_INSTALLED_VERSION)
     target_compile_options(gbCEmu PUBLIC /W4 /WX)
   endif()
 endif()
-
-# --------------------------------------------------------------------
-# Testing Setup
-# --------------------------------------------------------------------
-enable_testing()
-
-# --------------------------------------------------------------------
-# Test Coverage
-# --------------------------------------------------------------------
-if(ENABLE_TEST_COVERAGE)
-  target_compile_options(gbCEmu PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
-  target_link_options(gbCEmu PUBLIC -fprofile-arcs -ftest-coverage)
-endif()
-
-# --------------------------------------------------------------------
-# Source Grouping
-# --------------------------------------------------------------------
-GroupSourcesByFolder(${PROJECT_NAME})
-
