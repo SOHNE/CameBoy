@@ -20,6 +20,63 @@ include(../cmake/tools.cmake)
 CPMAddPackage(NAME gbCEmu SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 CPMAddPackage("gh:TheLartians/GroupSourcesByFolder.cmake@1.0")
 
+if(NOT DEFINED EMSCRIPTEN)
+  # SDL
+  find_package(SDL2 QUIET CONFIG COMPONENTS SDL2)
+  find_package(SDL2 QUIET CONFIG COMPONENTS SDL2main)
+
+  if(NOT SDL2_FOUND)
+    message(STATUS "System SDL2 not found, fetching using CPM...")
+    string(TIMESTAMP BEFORE "%s")
+
+    CPMAddPackage(
+      NAME SDL
+      GITHUB_REPOSITORY libsdl-org/SDL
+      GIT_TAG release-2.32.0
+      OPTIONS
+        "SDL_EXAMPLES OFF"
+        "SDL_TESTS OFF"
+    )
+
+    if(NOT SDL_ADDED)
+      message(FATAL_ERROR "Failed to add SDL2 package")
+    endif()
+
+    string(TIMESTAMP AFTER "%s")
+    math(EXPR DELTASDL "${AFTER} - ${BEFORE}")
+    message(STATUS "SDL2 built from source in ${DELTASDL}s")
+  else()
+    message(STATUS "Found system SDL2")
+  endif()
+
+  # SDL2_ttf
+  find_package(SDL2_ttf QUIET)
+
+  if(NOT SDL2_ttf_FOUND)
+    message(STATUS "System SDL2_ttf not found, fetching using CPM...")
+    string(TIMESTAMP BEFORE "%s")
+
+    CPMAddPackage(
+      NAME SDL_ttf
+      GITHUB_REPOSITORY libsdl-org/SDL_ttf
+      GIT_TAG release-2.24.0
+      OPTIONS
+        "SDL_EXAMPLES OFF"
+    )
+
+    if(NOT SDL_ttf_ADDED)
+      message(FATAL_ERROR "Failed to add SDL2_ttf package")
+    endif()
+
+    string(TIMESTAMP AFTER "%s")
+    math(EXPR DELTASDL "${AFTER} - ${BEFORE}")
+    message(STATUS "SDL2_ttf built from source in ${DELTASDL}s")
+  else()
+    message(STATUS "Found system SDL2_ttf")
+  endif()
+
+endif()
+
 # --------------------------------------------------------------------
 # Testbed Setup
 # --------------------------------------------------------------------
@@ -36,7 +93,15 @@ target_include_directories(${PROJECT_NAME}
       ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC gbCEmu::gbCEmu)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+      gbCEmu::gbCEmu
+      # SDL2
+      $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+      $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+      # SDL2_ttf
+      $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>
+)
 
 # --------------------------------------------------------------------
 # Platform-Specific Configuration

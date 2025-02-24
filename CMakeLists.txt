@@ -45,9 +45,6 @@ include(cmake/tools.cmake)
 list(APPEND GBE_DEPS_INCLUDE_DIR)
 list(APPEND GBE_DEPS_LINK)
 
-include(cmake/deps/sdl.cmake)
-include(cmake/deps/sdl_ttf.cmake)
-
 # --------------------------------------------------------------------
 # Global Properties
 # --------------------------------------------------------------------
