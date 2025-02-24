@@ -71,11 +71,8 @@ packageProject(
   VERSION_HEADER "${VERSION_HEADER_LOCATION}"
   EXPORT_HEADER "${EXPORT_HEADER_LOCATION}"
   COMPATIBILITY SameMajorVersion
-  DEPENDENCIES "Ccache 1.2.5;SDL release-2.32.0;SDL_ttf release-2.24.0"
+  DEPENDENCIES "Ccache 1.2.5;"
 )
-
-unset(VERSION_HEADER_LOCATION)
-unset(EXPORT_HEADER_LOCATION)
 
 # --------------------------------------------------------------------
 # License collector
