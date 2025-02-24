@@ -48,7 +48,7 @@ jobs:
                 -DCPM_SOURCE_CACHE=${CPM_SOURCE_CACHE} \
                 -DCMAKE_C_COMPILER_LAUNCHER=ccache \
                 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-                ../standalone
+                ../CameBoy
 
       - name: Build project
         run: cmake --build build -j4
