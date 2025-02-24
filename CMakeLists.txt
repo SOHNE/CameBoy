@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.26 FATAL_ERROR)
 project(
-  gbCEmu
+  CameCore
   VERSION 0.0.1
-  DESCRIPTION "A simple Game Boy™ Emulator"
+  DESCRIPTION "Core for a simple Game Boy™ Emulator"
   LANGUAGES C
-  HOMEPAGE_URL "https://github.com/SOHNE/gbCEmu"
+  HOMEPAGE_URL "https://github.com/SOHNE/CameBoy"
 )
 
 # Determine if LuGL is the main project
-set(GBE_IS_MAIN ${PROJECT_IS_TOP_LEVEL})
+set(CB_IS_MAIN ${PROJECT_IS_TOP_LEVEL})
 
 # --------------------------------------------------------------------
 # Paths
@@ -42,8 +42,8 @@ CPMAddPackage("gh:cpm-cmake/CPMLicenses.cmake@0.0.7")
 
 include(cmake/tools.cmake)
 
-list(APPEND GBE_DEPS_INCLUDE_DIR)
-list(APPEND GBE_DEPS_LINK)
+list(APPEND CB_DEPS_INCLUDE_DIR)
+list(APPEND CB_DEPS_LINK)
 
 # --------------------------------------------------------------------
 # Global Properties
@@ -53,7 +53,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # --------------------------------------------------------------------
 # Subdirectories
 # --------------------------------------------------------------------
-add_subdirectory(src gbCEmu)
+add_subdirectory(src CameCore)
 
 # --------------------------------------------------------------------
 # Installation Configuration

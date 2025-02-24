@@ -1,24 +1,24 @@
 #--------------------------------------------------------------------
 # Source and Header Files
 #--------------------------------------------------------------------
-set(GBE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/gbCEmu)
-set(GBE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+set(CB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/gbCEmu)
+set(CB_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
-list(APPEND GBE_HEADER_FILES
-    ${GBE_INCLUDE_DIR}/gbCEmu.h
+list(APPEND CB_HEADER_FILES
+    ${CB_INCLUDE_DIR}/gbCEmu.h
 )
 
-list(APPEND GBE_SOURCE_FILES
-    ${GBE_SOURCE_DIR}/emu.c
+list(APPEND CB_SOURCE_FILES
+    ${CB_SOURCE_DIR}/emu.c
 )
 
 #--------------------------------------------------------------------
 # Library Setup
 #--------------------------------------------------------------------
-add_library(${PROJECT_NAME} ${GBE_HEADER_FILES} ${GBE_SOURCE_FILES})
+add_library(${PROJECT_NAME} ${CB_HEADER_FILES} ${CB_SOURCE_FILES})
 
 # Link libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE ${GBE_DEPS_LINK})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CB_DEPS_LINK})
 
 # Sanitizers
 add_sanitizers(${PROJECT_NAME})
@@ -38,7 +38,7 @@ target_include_directories(${PROJECT_NAME}
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
   PRIVATE
-    ${GBE_DEPS_INCLUDE_DIR}
+    ${CB_DEPS_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -47,7 +47,7 @@ target_include_directories(${PROJECT_NAME}
 #--------------------------------------------------------------------
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
-        PUBLIC_HEADER "${GBE_HEADER_FILES}"
+        PUBLIC_HEADER "${CB_HEADER_FILES}"
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}
         C_EXTENSIONS OFF
@@ -59,16 +59,16 @@ set_target_properties(${PROJECT_NAME}
 # Compile definitions
 #--------------------------------------------------------------------
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC GBE_DEBUG)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC CB_DEBUG)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC GBE_RELEASE)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC CB_RELEASE)
 endif()
 
 if(BUILD_SHARED_LIBS)
   message(STATUS "Building shared library")
-  target_compile_definitions(${PROJECT_NAME} PUBLIC GBE_SHARED_DEFINE)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CB_SHARED_DEFINE)
 else()
-  target_compile_definitions(${PROJECT_NAME} PUBLIC GBE_STATIC_DEFINE)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CB_STATIC_DEFINE)
 endif()
 
 #--------------------------------------------------------------------

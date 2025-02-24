@@ -4,17 +4,17 @@
   <img alt="LeveGL Logo" src="./.github/assets/logo.svg" width="100px" align="left">
 </picture>
 
-### `gbCEmu` | Game Boy™ C Emulator
+### `CameBoy`
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/SOHNE/gbCEmu?style=flat)](https://github.com/SOHNE/gbCEmu/releases/latest)
-[![License](https://img.shields.io/github/license/SOHNE/gbCEmu?style=flat)](https://github.com/SOHNE/gbCEmu/blob/main/LICENSE)
-[![Standalone](https://github.com/SOHNE/gbCEmu/actions/workflows/standalone.yml/badge.svg)](https://github.com/SOHNE/gbCEmu/actions/workflows/standalone.yml)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/SOHNE/CameBoy?style=flat)](https://github.com/SOHNE/CameCore/releases/latest)
+[![License](https://img.shields.io/github/license/SOHNE/CameBoy?style=flat)](https://github.com/SOHNE/CameCore/blob/main/LICENSE)
+[![Standalone](https://github.com/SOHNE/CameBoy/actions/workflows/standalone.yml/badge.svg)](https://github.com/SOHNE/CameCore/actions/workflows/standalone.yml)
 
 
 ✨ Learning by doing: Exploring the fundamentals of emulation with a minimalist Game Boy™ project. 🎮
 
 <div flex="true">
-  <a href="https://github.com/SOHNE/gbCEmu/releases">
+  <a href="https://github.com/SOHNE/CameBoy/releases">
     Download
   </a>
   •
@@ -29,7 +29,7 @@
 
 ## Introduction
 
-`gbCEmu`—a raw dive into retro computing. This Game Boy™ emulator, built in `C99`, isn’t about bells or whistles. It’s a hands-on experiment pieced together from a patchwork of online insights, designed to reveal the bare mechanics behind this classic handheld. Here, every line of code tries to be a lesson in minimalism, without unnecessary clutter.
+`CameBoy`—a raw dive into retro computing. This Game Boy™ emulator, built in `C99`, isn’t about bells or whistles. It’s a hands-on experiment pieced together from a patchwork of online insights, designed to reveal the bare mechanics behind this classic handheld. Here, every line of code tries to be a lesson in minimalism, without unnecessary clutter.
 
 > _**This project** serves as my experimental platform to delve into emulation's core principles. As a personal endeavor aimed at hands-on learning, it doesn't fully mirror the original hardware's intricacies. I welcome any contributions or suggestions. Feel free to explore the code, report issues, or submit pull requests._
 

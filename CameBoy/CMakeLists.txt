@@ -2,7 +2,13 @@
 # Project Setup
 # --------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.26)
-project(gbCEmulator LANGUAGES C)
+project(
+  CameBoy
+  VERSION 0.0.1
+  DESCRIPTION "A simple Game Boy™ Emulator"
+  LANGUAGES C
+  HOMEPAGE_URL "https://github.com/SOHNE/CameBoy"
+)
 
 # --------------------------------------------------------------------
 # Output Directories
@@ -17,7 +23,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 include(../cmake/CPM.cmake)
 include(../cmake/tools.cmake)
 
-CPMAddPackage(NAME gbCEmu SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+CPMAddPackage(NAME CameCore SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 CPMAddPackage("gh:TheLartians/GroupSourcesByFolder.cmake@1.0")
 
 if(NOT DEFINED EMSCRIPTEN)
@@ -95,7 +101,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-      gbCEmu::gbCEmu
+      CameCore::CameCore
       # SDL2
       $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
       $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>

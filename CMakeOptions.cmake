@@ -3,9 +3,9 @@ include(CMakeDependentOption)
 #--------------------------------------------------------------------
 # Build Options
 #--------------------------------------------------------------------
-option(BUILD_SHARED_LIBS "Build gbEmu as a shared library" OFF)
+option(BUILD_SHARED_LIBS "Build CameCore as a shared library" OFF)
 
-option(USE_CCACHE "Enable compiler cache that can drastically improve build times" ${GBE_IS_MAIN})
+option(USE_CCACHE "Enable compiler cache that can drastically improve build times" ${CB_IS_MAIN})
 option(CCACHE_OPTIONS "Compiler cache options" "CCACHE_CPP2=true;CCACHE_SLOPPINESS=clang_index_store")
 
 #--------------------------------------------------------------------
