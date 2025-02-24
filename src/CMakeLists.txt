@@ -1,7 +1,7 @@
 #--------------------------------------------------------------------
 # Source and Header Files
 #--------------------------------------------------------------------
-set(CB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/CameBoy)
+set(CB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/CameCore)
 set(CB_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
 list(APPEND CB_HEADER_FILES

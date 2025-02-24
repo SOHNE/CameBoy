@@ -1,4 +1,4 @@
-#include "gbCEmu/gbCEmu.h"
+#include "CameCore/CameCore.h"
 #include <stdio.h>
 #include <stdlib.h>
 
