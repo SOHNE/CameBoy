@@ -1,15 +1,18 @@
 #--------------------------------------------------------------------
 # Source and Header Files
 #--------------------------------------------------------------------
-set(CB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/CameCore)
+set(CB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/camecore)
 set(CB_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
 list(APPEND CB_HEADER_FILES
-    ${CB_INCLUDE_DIR}/CameCore.h
+    ${CB_INCLUDE_DIR}/camecore.h
+    ${CB_INCLUDE_DIR}/ccapi.h
+    ${CB_INCLUDE_DIR}/utils.h
 )
 
 list(APPEND CB_SOURCE_FILES
     ${CB_SOURCE_DIR}/emu.c
+    ${CB_SOURCE_DIR}/utils.c
 )
 
 #--------------------------------------------------------------------
@@ -59,16 +62,16 @@ set_target_properties(${PROJECT_NAME}
 # Compile definitions
 #--------------------------------------------------------------------
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC CB_DEBUG)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CC_DEBUG)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC CB_RELEASE)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CC_RELEASE)
 endif()
 
 if(BUILD_SHARED_LIBS)
   message(STATUS "Building shared library")
-  target_compile_definitions(${PROJECT_NAME} PUBLIC CB_SHARED_DEFINE)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CC_SHARED_DEFINE)
 else()
-  target_compile_definitions(${PROJECT_NAME} PUBLIC CB_STATIC_DEFINE)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CC_STATIC_DEFINE)
 endif()
 
 #--------------------------------------------------------------------
