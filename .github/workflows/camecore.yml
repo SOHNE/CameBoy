@@ -1,4 +1,4 @@
-name: Standalone
+name: CameCore
 
 on:
   push:
