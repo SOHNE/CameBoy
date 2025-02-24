@@ -1,4 +1,4 @@
-#include "CameCore/CameCore.h"
+#include "camecore/camecore.h"
 #include <stdio.h>
 #include <stdlib.h>
 
