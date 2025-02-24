@@ -8,7 +8,7 @@
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/SOHNE/CameBoy?style=flat)](https://github.com/SOHNE/CameCore/releases/latest)
 [![License](https://img.shields.io/github/license/SOHNE/CameBoy?style=flat)](https://github.com/SOHNE/CameCore/blob/main/LICENSE)
-[![Standalone](https://github.com/SOHNE/CameBoy/actions/workflows/cameboy.yml/badge.svg)](https://github.com/SOHNE/CameCore/actions/workflows/cameboy.yml)
+[![Standalone](https://github.com/SOHNE/CameBoy/actions/workflows/cameboy.yml/badge.svg)](https://github.com/SOHNE/CameBoy/actions/workflows/cameboy.yml)
 
 
 ✨ Learning by doing: Exploring the fundamentals of emulation with a minimalist Game Boy™ project. 🎮
