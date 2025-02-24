@@ -1,11 +1,11 @@
 #--------------------------------------------------------------------
 # Source and Header Files
 #--------------------------------------------------------------------
-set(CB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/gbCEmu)
+set(CB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/CameBoy)
 set(CB_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
 list(APPEND CB_HEADER_FILES
-    ${CB_INCLUDE_DIR}/gbCEmu.h
+    ${CB_INCLUDE_DIR}/CameCore.h
 )
 
 list(APPEND CB_SOURCE_FILES
