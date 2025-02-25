@@ -7,9 +7,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-//---------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // Base types
-//---------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 typedef uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -19,9 +19,9 @@ typedef int16_t  i16;
 typedef int64_t  i64;
 typedef uint64_t u64;
 
-//---------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // Defines
-//---------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #if defined( __cplusplus )
 #    define CLITERAL( type ) type
 #else
@@ -58,9 +58,7 @@ typedef uint64_t u64;
 #    define UNLIKELY( x ) ( x )
 #endif
 
-//---------------------------------
 // Bit operations
-//---------------------------------
 #define BIT( n )                  ( 0x1U << ( n ) )
 #define BIT_SET( v, n )           ( ( v ) |= BIT( n ) )
 #define BIT_CLEAR( v, n )         ( ( v ) &= ~BIT( n ) )
@@ -71,25 +69,13 @@ typedef uint64_t u64;
 #define REG_GET( reg, mask )      ( ( reg ) & ( mask ) )
 #define REG_SET( reg, mask, val ) ( ( reg ) = ( ( reg ) & ~( mask ) ) | ( ( val ) & ( mask ) ) )
 
-//---------------------------------
-// Emulation utilities
-//---------------------------------
 #define CC_MAX( a, b )            ( ( a ) > ( b ) ? ( a ) : ( b ) )
 #define CC_MIN( a, b )            ( ( a ) < ( b ) ? ( a ) : ( b ) )
 #define CC_CLAMP( x, lo, hi )     ( ( x ) < ( lo ) ? ( lo ) : ( ( x ) > ( hi ) ? ( hi ) : ( x ) ) )
 
-typedef enum
-{
-    LOG_ALL = 0, // Display all logs
-    LOG_TRACE,   // Trace logging, intended for internal use only
-    LOG_DEBUG,   // Debug logging, used for internal debugging, it should be disabled on release builds
-    LOG_INFO,    // Info logging, used for program execution info
-    LOG_WARNING, // Warning logging, used on recoverable failures
-    LOG_ERROR,   // Error logging, used on unrecoverable failures
-    LOG_FATAL,   // Fatal logging, used to abort program: exit(EXIT_FAILURE)
-    LOG_NONE     // Disable logging
-} TraceLogLevel;
-
+//----------------------------------------------------------------------------------------------------------------------
+// Structures Definition
+//----------------------------------------------------------------------------------------------------------------------
 // Basic structure
 typedef struct
 {
@@ -139,11 +125,40 @@ typedef struct RomHeader
     u16 global_checksum; // 014E-014F: ROM checksum (excluding self), not verified by boot ROM
 } RomHeader;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Enumerators Definition
+//----------------------------------------------------------------------------------------------------------------------
+typedef enum
+{
+    LOG_ALL = 0, // Display all logs
+    LOG_TRACE,   // Trace logging, intended for internal use only
+    LOG_DEBUG,   // Debug logging, used for internal debugging, it should be disabled on release builds
+    LOG_INFO,    // Info logging, used for program execution info
+    LOG_WARNING, // Warning logging, used on recoverable failures
+    LOG_ERROR,   // Error logging, used on unrecoverable failures
+    LOG_FATAL,   // Fatal logging, used to abort program: exit(EXIT_FAILURE)
+    LOG_NONE     // Disable logging
+} TraceLogLevel;
+
+//----------------------------------------------------------------------------------------------------------------------
+// Functions Declaration
+//----------------------------------------------------------------------------------------------------------------------
+
+/* clang-format off */
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 // Core functions
 void gb_init( GameBoy * gb );
 void gb_load_rom( GameBoy * gb, const char * filename );
 void gb_step( GameBoy * gb );
 
 void TraceLog( int logLevel, const char * text, ... );
+
+#if defined(__cplusplus)
+}
+#endif
+/* clang-format on */
 
 #endif // !GBCE_H
