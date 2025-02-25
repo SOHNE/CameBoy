@@ -31,7 +31,9 @@ AlignConsecutiveShortCaseStatements:
   AlignCaseColons: false
 AlignEscapedNewlines: Right
 AlignOperands: true
-AlignTrailingComments: true
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 2
 AllowAllArgumentsOnNextLine: true
 AllowAllConstructorInitializersOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: true
