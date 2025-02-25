@@ -76,6 +76,18 @@ typedef uint64_t u64;
 //----------------------------------------------------------------------------------------------------------------------
 // Structures Definition
 //----------------------------------------------------------------------------------------------------------------------
+// Ensure boolean type
+#if ( defined( __STDC__ ) && __STDC_VERSION__ >= 199901L ) || ( defined( _MSC_VER ) && _MSC_VER >= 1800 )
+#    include <stdbool.h>
+#elif !defined( __cplusplus ) && !defined( bool )
+typedef enum bool
+{
+    false = 0,
+    true  = !false
+} bool;
+#    define CC_BOOL_TYPE
+#endif
+
 // Basic structure
 typedef struct
 {
