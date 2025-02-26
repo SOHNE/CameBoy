@@ -1,14 +1,17 @@
 name: CameCore
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - master
-      - main
+    paths:
+      - 'include/**'
+      - 'src/**'
+      - '.github/workflows/camecore.yml'
   pull_request:
-    branches:
-      - master
-      - main
+    paths:
+      - 'include/**'
+      - 'src/**'
+      - '.github/workflows/camecore.yml'
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
@@ -16,6 +19,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
 
     steps:
       - name: Checkout repository
