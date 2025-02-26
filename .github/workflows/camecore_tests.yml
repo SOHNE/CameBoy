@@ -1,0 +1,66 @@
+name: CameCore Tests
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'include/**'
+      - 'src/**'
+      - '.github/workflows/camecore_tests.yml'
+  pull_request:
+    paths:
+      - 'include/**'
+      - 'src/**'
+      - '.github/workflows/camecore_tests.yml'
+
+env:
+  CTEST_OUTPUT_ON_FAILURE: 1
+  CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --- Cache CPM modules ---
+      - name: Cache CPM modules
+        id: cache-cpm
+        uses: actions/cache@v4
+        with:
+          path: "**/cpm_modules"
+          key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+          restore-keys: |
+            ${{ runner.os }}-cpm-
+
+      # --- Set up ccache via GitHub Action ---
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          create-symlink: true
+
+      # --- Configure, build ---
+      - name: Configure project with CMake
+        run: |
+          mkdir -p build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug \
+                -DCPM_SOURCE_CACHE=${CPM_SOURCE_CACHE} \
+                -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+                -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+                ../tests
+
+      - name: Build project
+        run: cmake --build build -j4
+
+      # --- Run tests ---
+      - name: Test project
+        uses: threeal/ctest-action@v1.1.0
+        with:
+            test-dir: build
+            build-config: Debug
+
