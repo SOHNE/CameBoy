@@ -29,6 +29,13 @@ typedef struct PACKED CartContext
 
 } CartContext;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Variables Definition
+//----------------------------------------------------------------------------------------------------------------------
+// Cart state context
+CartContext ctx = { 0 };
+
+// Kind of hardware is present on the cartridge
 static const char * ROM_TYPES[] = {
     "ROM ONLY",
     "MBC1",
@@ -67,6 +74,7 @@ static const char * ROM_TYPES[] = {
     "MBC7+SENSOR+RUMBLE+RAM+BATTERY",
 };
 
+// ASCII “licensee code” indicating the game’s publisher
 static const char * LIC_CODE[0xA5] = { [0x00] = "None",
                                        [0x01] = "Nintendo R&D1",
                                        [0x08] = "Capcom",
@@ -128,11 +136,6 @@ static const char * LIC_CODE[0xA5] = { [0x00] = "None",
                                        [0x97] = "Kaneko",
                                        [0x99] = "Pack in soft",
                                        [0xA4] = "Konami (Yu-Gi-Oh!)" };
-
-//----------------------------------------------------------------------------------------------------------------------
-// Variables Definition
-//----------------------------------------------------------------------------------------------------------------------
-CartContext ctx = { 0 };
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definition: Getters
