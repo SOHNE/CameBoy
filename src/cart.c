@@ -142,11 +142,11 @@ static const char * LIC_CODE[0xA5] = { [0x00] = "None",
 //----------------------------------------------------------------------------------------------------------------------
 // Get cart game’s publisher based on `ROM_TYPES` lookup table
 const char *
-GetCartLicenseeName( void )
+GetCartTypeName( void )
 {
-    if( ctx.rom.header->new_lic_code <= 0xA4 )
+    if( ctx.rom.header->type <= 0x22 )
         {
-            return LIC_CODE[ctx.rom.header->lic_code];
+            return ROM_TYPES[ctx.rom.header->type];
         }
 
     return "UNKNOWN";
@@ -154,11 +154,11 @@ GetCartLicenseeName( void )
 
 // Get the hardware that is present on the cartridge based on `LIC_CODE` lookup table
 const char *
-GetCartTypeName( void )
+GetCartLicenseeName( void )
 {
-    if( ctx.rom.header->type <= 0x22 )
+    if( ctx.rom.header->new_lic_code <= 0xA4 )
         {
-            return ROM_TYPES[ctx.rom.header->type];
+            return LIC_CODE[ctx.rom.header->lic_code];
         }
 
     return "UNKNOWN";
