@@ -165,10 +165,9 @@ typedef enum
 extern "C" {
 #endif
 
-// Core functions
-void gb_init( GameBoy * gb );
-void gb_load_rom( GameBoy * gb, const char * filename );
-void gb_step( GameBoy * gb );
+// Core
+//------------------------------------------------------------------
+CCAPI void Init( void );
 
 // Cart
 //------------------------------------------------------------------
@@ -178,7 +177,7 @@ CCAPI void CartWrite( u16 address, u8 value );
 
 // NOTE: Implemented in `utils`
 //------------------------------------------------------------------
-void TraceLog( int logLevel, const char * text, ... );
+CCAPI void TraceLog( int logLevel, const char * text, ... );
 
 #if defined(__cplusplus)
 }

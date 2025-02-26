@@ -12,7 +12,7 @@ list(APPEND CB_HEADER_FILES
 
 list(APPEND CB_SOURCE_FILES
     ${CB_SOURCE_DIR}/cart.c
-    ${CB_SOURCE_DIR}/emu.c
+    ${CB_SOURCE_DIR}/core.c
     ${CB_SOURCE_DIR}/utils.c
 )
 
