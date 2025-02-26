@@ -140,7 +140,7 @@ static const char * LIC_CODE[0xA5] = { [0x00] = "None",
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definition: Getters
 //----------------------------------------------------------------------------------------------------------------------
-// Get cart game’s publisher based on `ROM_TYPES` lookup table
+// Get the hardware that is present on the cartridge based on `LIC_CODE` lookup table
 const char *
 GetCartTypeName( void )
 {
@@ -152,7 +152,7 @@ GetCartTypeName( void )
     return "UNKNOWN";
 }
 
-// Get the hardware that is present on the cartridge based on `LIC_CODE` lookup table
+// Get cart game’s publisher based on `ROM_TYPES` lookup table
 const char *
 GetCartLicenseeName( void )
 {
