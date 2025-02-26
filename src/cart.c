@@ -273,6 +273,7 @@ CartRead( u16 address )
 {
     UNUSED( address );
     NO_IMPL();
+    return 0;
 }
 
 // Perform write operation onto cartridge
