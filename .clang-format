@@ -23,7 +23,13 @@ AlignConsecutiveDeclarations:
   AlignCompound: true
   AlignFunctionPointers: true
   PadOperators: true
-AlignConsecutiveMacros: AcrossEmptyLinesAndComments
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCompound: false
+  AlignFunctionPointers: false
+  PadOperators: true
 AlignConsecutiveShortCaseStatements:
   Enabled: true
   AcrossEmptyLines: true
@@ -127,7 +133,7 @@ PenaltyBreakComment: 1000
 PenaltyBreakFirstLessLess: 1000
 PenaltyBreakString: 1000
 PenaltyBreakTemplateDeclaration: 10
-PackConstructorInitializers: CurrentLine
+PackConstructorInitializers: BinPack
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Middle
