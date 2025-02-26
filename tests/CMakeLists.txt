@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(gbCEmuTests LANGUAGES C)
+project(CameCoreTests LANGUAGES C)
 
 # --------------------------------------------------------------------
 # Options
@@ -31,9 +31,9 @@ if(NOT Check_ADDED)
 endif()
 
 if(TEST_INSTALLED_VERSION)
-  find_package(gbCEmu REQUIRED)
+  find_package(CameCore REQUIRED)
 else()
-  CPMAddPackage(NAME gbCEmu SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+  CPMAddPackage(NAME CameCore SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 endif()
 
 # --------------------------------------------------------------------
@@ -54,7 +54,7 @@ foreach(test_src IN LISTS UNIT_TESTS_SOURCES)
 
   # Create test
   add_executable(${test_name} ${test_src})
-  target_link_libraries(${test_name} PRIVATE gbCEmu::gbCEmu Check::check)
+  target_link_libraries(${test_name} PRIVATE CameCore::CameCore Check::check)
 
   # Add the test to CTest
   add_test(NAME ${test_name} COMMAND ${test_name})
@@ -73,8 +73,8 @@ endforeach()
 # --------------------------------------------------------------------
 if(NOT TEST_INSTALLED_VERSION)
   if(CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "GNU")
-    target_compile_options(gbCEmu PUBLIC -Wall -Wpedantic -Wextra -Werror)
+    target_compile_options(CameCore PUBLIC -Wall -Wpedantic -Wextra -Werror)
   elseif(MSVC)
-    target_compile_options(gbCEmu PUBLIC /W4 /WX)
+    target_compile_options(CameCore PUBLIC /W4 /WX)
   endif()
 endif()
