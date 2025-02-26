@@ -62,20 +62,20 @@ typedef uint64_t u64;
 #endif
 
 // Validations
-#define IS_STR_VALID( str )          ( ( str ) != NULL && ( str )[0] != '\0' )
+#define IS_STR_VALID( str ) ( ( str ) != NULL && ( str )[0] != '\0' )
 
 // Direct bit operations
-#define BIT( n )                     ( 0x01U << ( n ) )
-#define BIT_SET( r, n )              ( ( r ) |= BIT( n ) )
-#define BIT_CLEAR( r, n )            ( ( r ) &= ~BIT( n ) )
-#define BIT_TOGGLE( r, n )           ( ( r ) ^= BIT( n ) )
-#define BIT_CHECK( r, n )            ( ( r ) & BIT( n ) )
+#define BIT( n )            ( 0x01U << ( n ) )
+#define BIT_SET( r, n )     ( ( r ) |= BIT( n ) )
+#define BIT_CLEAR( r, n )   ( ( r ) &= ~BIT( n ) )
+#define BIT_TOGGLE( r, n )  ( ( r ) ^= BIT( n ) )
+#define BIT_CHECK( r, n )   ( ( r ) & BIT( n ) )
 
 // Flags operation macros
-#define FLAG_SET( n, f )             ( ( n ) |= ( f ) )
-#define FLAG_CLEAR( n, f )           ( ( n ) &= ~( f ) )
-#define FLAG_TOGGLE( n, f )          ( ( n ) ^= ( f ) )
-#define FLAG_CHECK( n, f )           ( ( n ) & ( f ) )
+#define FLAG_SET( n, f )    ( ( n ) |= ( f ) )
+#define FLAG_CLEAR( n, f )  ( ( n ) &= ~( f ) )
+#define FLAG_TOGGLE( n, f ) ( ( n ) ^= ( f ) )
+#define FLAG_CHECK( n, f )  ( ( n ) & ( f ) )
 
 //----------------------------------------------------------------------------------------------------------------------
 // Structures Definition
@@ -160,28 +160,32 @@ typedef enum
 // Functions Declaration
 //----------------------------------------------------------------------------------------------------------------------
 
-/* clang-format off */
-#if defined(__cplusplus)
-extern "C" {
+#if defined( __cplusplus )
+extern "C"
+{
 #endif
 
-// Core
-//------------------------------------------------------------------
-CCAPI void Init( void );
+    // Core
+    //------------------------------------------------------------------
+    CCAPI void Init( void );
 
-// Cart
-//------------------------------------------------------------------
-CCAPI bool CartLoad( char * cart );
-CCAPI u8 CartRead( u16 address );
-CCAPI void CartWrite( u16 address, u8 value );
+    // Bus
+    //------------------------------------------------------------------
+    CCAPI u8   BusRead( u16 addr );
+    CCAPI void BusWrite( u16 addr, u8 value );
 
-// NOTE: Implemented in `utils`
-//------------------------------------------------------------------
-CCAPI void TraceLog( int logLevel, const char * text, ... );
+    // Cart
+    //------------------------------------------------------------------
+    CCAPI bool CartLoad( char * cart );
+    CCAPI u8   CartRead( u16 address );
+    CCAPI void CartWrite( u16 address, u8 value );
 
-#if defined(__cplusplus)
+    // NOTE: Implemented in `utils`
+    //------------------------------------------------------------------
+    CCAPI void TraceLog( int logLevel, const char * text, ... );
+
+#if defined( __cplusplus )
 }
 #endif
-/* clang-format on */
 
 #endif // !GBCE_H
