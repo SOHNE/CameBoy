@@ -31,6 +31,9 @@ typedef uint64_t u64;
 /// compound literals
 #define UNUSED( x ) (void)( x )
 
+/// No implementation
+#define NO_IMPL()   LOG( LOG_FATAL, "Not implemented: %s (%s:%d)", __func__, __FILE__, __LINE__ )
+
 /// Compiler attributes
 #if defined( __GNUC__ ) || defined( __clang__ )
 #    define NORETURN      __attribute__( ( noreturn ) )
@@ -58,20 +61,21 @@ typedef uint64_t u64;
 #    define UNLIKELY( x ) ( x )
 #endif
 
-// Bit operations
-#define BIT( n )                  ( 0x1U << ( n ) )
-#define BIT_SET( v, n )           ( ( v ) |= BIT( n ) )
-#define BIT_CLEAR( v, n )         ( ( v ) &= ~BIT( n ) )
-#define BIT_TEST( v, n )          ( !!( ( v ) & BIT( n ) ) )
-#define BIT_TOGGLE( v, n )        ( ( v ) ^= BIT( n ) )     // Toggle bit
-#define BIT_MASK( len )           ( ( 1U << ( len ) ) - 1 ) // Create a bit mask of 'len' bits
-// 8-bit register manipulation
-#define REG_GET( reg, mask )      ( ( reg ) & ( mask ) )
-#define REG_SET( reg, mask, val ) ( ( reg ) = ( ( reg ) & ~( mask ) ) | ( ( val ) & ( mask ) ) )
+// Validations
+#define IS_STR_VALID( str )          ( ( str ) != NULL && ( str )[0] != '\0' )
 
-#define CC_MAX( a, b )            ( ( a ) > ( b ) ? ( a ) : ( b ) )
-#define CC_MIN( a, b )            ( ( a ) < ( b ) ? ( a ) : ( b ) )
-#define CC_CLAMP( x, lo, hi )     ( ( x ) < ( lo ) ? ( lo ) : ( ( x ) > ( hi ) ? ( hi ) : ( x ) ) )
+// Direct bit operations
+#define BIT( n )                     ( 0x01U << ( n ) )
+#define BIT_SET( r, n )              ( ( r ) |= BIT( n ) )
+#define BIT_CLEAR( r, n )            ( ( r ) &= ~BIT( n ) )
+#define BIT_TOGGLE( r, n )           ( ( r ) ^= BIT( n ) )
+#define BIT_CHECK( r, n )            ( ( r ) & BIT( n ) )
+
+// Flags operation macros
+#define FLAG_SET( n, f )             ( ( n ) |= ( f ) )
+#define FLAG_CLEAR( n, f )           ( ( n ) &= ~( f ) )
+#define FLAG_TOGGLE( n, f )          ( ( n ) ^= ( f ) )
+#define FLAG_CHECK( n, f )           ( ( n ) & ( f ) )
 
 //----------------------------------------------------------------------------------------------------------------------
 // Structures Definition
@@ -115,7 +119,7 @@ typedef struct
  *
  * @see https://gbdev.io/pandocs/The_Cartridge_Header.html
  */
-typedef struct RomHeader
+typedef struct PACKED RomHeader
 {
     u8 entry[4];         // 0100-0103: Entry point (usually nop & jp to 0150)
     u8 logo[0x30];       // 0104-0133: Nintendo logo (must match specific bitmap)
@@ -166,6 +170,14 @@ void gb_init( GameBoy * gb );
 void gb_load_rom( GameBoy * gb, const char * filename );
 void gb_step( GameBoy * gb );
 
+// Cart
+//------------------------------------------------------------------
+CCAPI bool CartLoad( char * cart );
+CCAPI u8 CartRead( u16 address );
+CCAPI void CartWrite( u16 address, u8 value );
+
+// NOTE: Implemented in `utils`
+//------------------------------------------------------------------
 void TraceLog( int logLevel, const char * text, ... );
 
 #if defined(__cplusplus)
