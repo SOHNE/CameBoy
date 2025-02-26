@@ -144,11 +144,10 @@ static const char * LIC_CODE[0xA5] = { [0x00] = "None",
 const char *
 GetCartTypeName( void )
 {
-    if( ctx.rom.header->type <= 0x22 )
+    if( 0x22 >= ctx.rom.header->type )
         {
             return ROM_TYPES[ctx.rom.header->type];
         }
-
     return "UNKNOWN";
 }
 
@@ -156,11 +155,10 @@ GetCartTypeName( void )
 const char *
 GetCartLicenseeName( void )
 {
-    if( ctx.rom.header->new_lic_code <= 0xA4 )
+    if( 0xA4 >= ctx.rom.header->new_lic_code )
         {
             return LIC_CODE[ctx.rom.header->lic_code];
         }
-
     return "UNKNOWN";
 }
 
