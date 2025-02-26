@@ -253,13 +253,13 @@ CartLoad( char * cartPath )
 
     // Log cart info
     LOG( LOG_INFO, "Cartridge Loaded:" );
-    LOG( LOG_INFO, "    Title    : %s", ctx.rom.header->title );
-    LOG( LOG_INFO, "    Type     : %02X (%s)", ctx.rom.header->type, GetCartTypeName() );
-    LOG( LOG_INFO, "    ROM Size : %zu KB", 32UL << ctx.rom.header->rom_size );
-    LOG( LOG_INFO, "    RAM Size : %02X", ctx.rom.header->ram_size );
-    LOG( LOG_INFO, "    LIC Code : %02X (%s)", ctx.rom.header->lic_code, GetCartLicenseeName() );
-    LOG( LOG_INFO, "    ROM Vers : %02X", ctx.rom.header->version );
-    LOG( LOG_INFO, "    Checksum : %02X (%s)", ctx.rom.header->checksum, ( chkValid ) ? "PASSED" : "FAILED" );
+    LOG( LOG_INFO, "    > Title    : %s", ctx.rom.header->title );
+    LOG( LOG_INFO, "    > Type     : %02X (%s)", ctx.rom.header->type, GetCartTypeName() );
+    LOG( LOG_INFO, "    > ROM Size : %zu KB", 32UL << ctx.rom.header->rom_size );
+    LOG( LOG_INFO, "    > RAM Size : %02X", ctx.rom.header->ram_size );
+    LOG( LOG_INFO, "    > LIC Code : %02X (%s)", ctx.rom.header->lic_code, GetCartLicenseeName() );
+    LOG( LOG_INFO, "    > ROM Vers : %02X", ctx.rom.header->version );
+    LOG( LOG_INFO, "    > Checksum : %02X (%s)", ctx.rom.header->checksum, ( chkValid ) ? "PASSED" : "FAILED" );
 
     return true;
 }
