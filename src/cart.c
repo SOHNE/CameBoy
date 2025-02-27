@@ -271,9 +271,7 @@ CartLoad( char * cartPath )
 u8
 CartRead( u16 address )
 {
-    UNUSED( address );
-    NO_IMPL();
-    return 0;
+    return ctx.rom.data[address];
 }
 
 // Perform write operation onto cartridge
