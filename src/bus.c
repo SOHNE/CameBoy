@@ -38,6 +38,7 @@ BusRead( u16 addr )
         }
 
     NO_IMPL();
+    return 0;
 }
 
 void
