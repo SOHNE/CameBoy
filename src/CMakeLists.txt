@@ -18,6 +18,7 @@ list(APPEND CB_SOURCE_FILES
     ${CB_SOURCE_DIR}/cart.c
     ${CB_SOURCE_DIR}/core.c
     ${CB_SOURCE_DIR}/cpu.c
+    ${CB_SOURCE_DIR}/instr.c
 )
 
 #--------------------------------------------------------------------
