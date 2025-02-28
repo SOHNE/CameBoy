@@ -203,6 +203,7 @@ CartLoad( char * cartPath )
             LOG( LOG_INFO, "Failed to open: %s", cartPath );
             return false;
         }
+    LOG( LOG_INFO, "Loading: '%s'", cartPath );
 
     // Get file size
     if( 0 != fseek( cartFile, 0, SEEK_END ) )
