@@ -401,7 +401,7 @@ extern "C"
     CCAPI void TraceLog( i32 logLevel, const char * text, ... );
     CCAPI void SetLogLevel( i32 logLevel );
 
-    CCAPI u8 * LoadFileData( const char * filename, size_t * bytesRead );
+    CCAPI u8 * LoadFileData( const char * filename, size_t * outBytesRead );
     CCAPI bool SaveFileData( const char * filename, const u8 * data, size_t dataSize );
 
 #if defined( __cplusplus )

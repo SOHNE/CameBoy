@@ -63,9 +63,9 @@ TraceLog( i32 logType, const char * text, ... )
 }
 
 u8 *
-LoadFileData( const char * filename, size_t * bytesRead )
+LoadFileData( const char * filename, size_t * outBytesRead )
 {
-    *bytesRead = 0;
+    *outBytesRead = 0;
 
     // Validate filename
     if( !IS_STR_VALID( filename ) || strlen( filename ) > MAX_FILEPATH_LENGTH )
@@ -102,18 +102,18 @@ LoadFileData( const char * filename, size_t * bytesRead )
             return NULL;
         }
 
-    *bytesRead = fread( buffer, 1, size, file );
-    if( size != *bytesRead )
+    *outBytesRead = fread( buffer, 1, size, file );
+    if( size != *outBytesRead )
         {
-            LOG( LOG_ERROR, "FILEIO: [%s] File partially read (%zu of %u bytes)", filename, *bytesRead, size );
+            LOG( LOG_ERROR, "FILEIO: [%s] File partially read (%zu of %u bytes)", filename, *outBytesRead, size );
             free( buffer );
             fclose( file );
-            *bytesRead = 0;
+            *outBytesRead = 0;
             return NULL;
         }
 
     fclose( file );
-    LOG( LOG_INFO, "FILEIO: [%s] File loaded successfully (%zu bytes)", filename, *bytesRead );
+    LOG( LOG_INFO, "FILEIO: [%s] File loaded successfully (%zu bytes)", filename, *outBytesRead );
     return buffer;
 }
 
