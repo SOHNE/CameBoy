@@ -15,6 +15,47 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Types and Structures Definition
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * @struct RomHeader
+ * @brief Game Boy cartridge header (0100-014Fh range)
+ *
+ * Defines ROM metadata including boot behavior, hardware requirements, and validation data.
+ * Critical fields:
+ * - Entry point instructions
+ * - Nintendo logo bitmap (verified at boot)
+ * - Title/manufacturer codes
+ * - CGB/SGB compatibility flags
+ * - Memory configuration (MBC type, ROM/RAM sizes)
+ * - Checksums and regional codes
+ *
+ * @note Logo bytes (0104-0133h) must match Nintendo's bitmap or boot fails
+ * @warning Header checksum (014Dh) must validate via 0134h-014Ch subtraction chain
+ * @remark 013F-0143h contains manufacturer code (4 chars) and CGB flag ($80/C0)
+ *
+ * @see https://gbdev.io/pandocs/The_Cartridge_Header.html
+ */
+typedef struct PACKED RomHeader
+{
+    u8 entry[4];         /**< 0100-0103: Entry point (usually nop & jp to 0150) */
+    u8 logo[0x30];       /**< 0104-0133: Nintendo logo (must match specific bitmap)
+                              Top half (0104-011B) checked on CGB, full check on DMG */
+
+    char title[16];      /**< 0134-0143: Title in uppercase ASCII (padded with 00s)
+                              Newer carts use 013F-0142 as manufacturer code,
+                              0143 as CGB flag ($80=enhanced, $C0=CGB only) */
+
+    u16 new_lic_code;    /**< 0144-0145: New licensee code (ASCII, e.g. 00=None, 01=Nintendo) */
+    u8  sgb_flag;        /**< 0146: SGB support ($03=enabled, others disable commands) */
+    u8  type;            /**< 0147: Cartridge type (MBC1=$01, MBC3=$13, etc.) */
+    u8  rom_size;        /**< 0148: ROM size (32KB << value; $00=32KB, $01=64KB, ...) */
+    u8  ram_size;        /**< 0149: RAM size ($00=None, $02=8KB, $03=32KB, etc.) */
+    u8  dest_code;       /**< 014A: Destination ($00=Japan, $01=Overseas) */
+    u8  lic_code;        /**< 014B: Old licensee code ($33 uses new code) */
+    u8  version;         /**< 014C: Version number (usually $00) */
+    u8  checksum;        /**< 014D: Header checksum (x=0; for 0134-014C: x=x - byte - 1) */
+    u16 global_checksum; /**< 014E-014F: ROM checksum (excluding self), not verified by boot ROM */
+} RomHeader;
+
 // Cart state context data
 typedef struct PACKED CartContext
 {
