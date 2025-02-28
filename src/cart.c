@@ -192,57 +192,25 @@ CartLoad( char * cartPath )
             return false;
         }
 
-    // Init context and copy filename
+    // Init context
     memset( &ctx, 0, sizeof( ctx ) );
     snprintf( ctx.rom.filename, sizeof( ctx.rom.filename ), "%s", cartPath );
 
-    // Open cart file
-    FILE * const cartFile = fopen( cartPath, "rb" );
-    if( NULL == cartFile )
-        {
-            LOG( LOG_INFO, "Failed to open: %s", cartPath );
-            return false;
-        }
-    LOG( LOG_INFO, "Loading: '%s'", cartPath );
-
-    // Get file size
-    if( 0 != fseek( cartFile, 0, SEEK_END ) )
-        {
-            LOG( LOG_ERROR, "Unable to read cartridge file: %s", cartPath );
-            fclose( cartFile );
-            return false;
-        }
-
-    ctx.rom.size = ftell( cartFile );
+    // Load cartrige file
+    size_t          bytesRead = 0;
+    uint8_t * const fileData  = LoadFileData( cartPath, &bytesRead );
+    if( NULL == fileData || 0 == bytesRead ) return false;
 
     // Validate file size
-    if( (long)( HEADER_OFFSET + sizeof( RomHeader ) ) > ctx.rom.size )
+    if( ( HEADER_OFFSET + sizeof( RomHeader ) ) > bytesRead )
         {
             LOG( LOG_ERROR, "File too small for valid header: %s", cartPath );
-            fclose( cartFile );
+            free( fileData );
             return false;
         }
 
-    rewind( cartFile );
-
-    // Alloc memory
-    ctx.rom.data = malloc( ctx.rom.size );
-    if( NULL == ctx.rom.data )
-        {
-            LOG( LOG_ERROR, "Memory allocation failed for ROM data." );
-            fclose( cartFile );
-            return false;
-        }
-
-    // Read data
-    size_t readBytes = fread( ctx.rom.data, 1, ctx.rom.size, cartFile );
-    fclose( cartFile );
-    if( readBytes != ctx.rom.size )
-        {
-            LOG( LOG_ERROR, "Incomplete ROM data read from: %s", cartPath );
-            free( ctx.rom.data );
-            return false;
-        }
+    ctx.rom.size = bytesRead;
+    ctx.rom.data = fileData;
 
     // Setup header and null-terminate title
     ctx.rom.header                                 = (RomHeader *)( (unsigned char *)ctx.rom.data + HEADER_OFFSET );
@@ -250,17 +218,17 @@ CartLoad( char * cartPath )
 
     // Verify checksum
     const unsigned char calcChksum = GetHeaderChecksum( ctx.rom.data );
-    const bool          chkValid   = ( ctx.rom.header->checksum == calcChksum );
+    const bool          chkValid   = ( calcChksum == ctx.rom.header->checksum );
 
-    // Log cart info
+    // Log cart info (Yoda used in comparisons)
     LOG( LOG_INFO, "Cartridge Loaded:" );
     LOG( LOG_INFO, "    > Title    : %s", ctx.rom.header->title );
     LOG( LOG_INFO, "    > Type     : %02X (%s)", ctx.rom.header->type, GetCartTypeName() );
-    LOG( LOG_INFO, "    > ROM Size : %zu KB", 32UL << ctx.rom.header->rom_size );
+    LOG( LOG_INFO, "    > ROM Size : %zu KB", (size_t)( 32UL << ctx.rom.header->rom_size ) );
     LOG( LOG_INFO, "    > RAM Size : %02X", ctx.rom.header->ram_size );
     LOG( LOG_INFO, "    > LIC Code : %02X (%s)", ctx.rom.header->lic_code, GetCartLicenseeName() );
     LOG( LOG_INFO, "    > ROM Vers : %02X", ctx.rom.header->version );
-    LOG( LOG_INFO, "    > Checksum : %02X (%s)", ctx.rom.header->checksum, ( chkValid ) ? "PASSED" : "FAILED" );
+    LOG( LOG_INFO, "    > Checksum : %02X (%s)", ctx.rom.header->checksum, ( true == chkValid ) ? "PASSED" : "FAILED" );
 
     return true;
 }

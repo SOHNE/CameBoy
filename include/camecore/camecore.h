@@ -396,9 +396,13 @@ extern "C"
     //------------------------------------------------------------------
     CCAPI char * GetInstructionName( InsType t );
 
-    // NOTE: Implemented in `utils`
+    // Utils
     //------------------------------------------------------------------
-    CCAPI void TraceLog( int logLevel, const char * text, ... );
+    CCAPI void TraceLog( i32 logLevel, const char * text, ... );
+    CCAPI void SetLogLevel( i32 logLevel );
+
+    CCAPI u8 * LoadFileData( const char * filename, size_t * bytesRead );
+    CCAPI bool SaveFileData( const char * filename, const u8 * data, size_t dataSize );
 
 #if defined( __cplusplus )
 }
