@@ -78,6 +78,21 @@ typedef uint64_t u64;
 #define FLAG_CHECK( n, f )  ( ( n ) & ( f ) )
 
 //----------------------------------------------------------------------------------------------------------------------
+// Enumerators Definition
+//----------------------------------------------------------------------------------------------------------------------
+typedef enum
+{
+    LOG_ALL = 0, // Display all logs
+    LOG_TRACE,   // Trace logging, intended for internal use only
+    LOG_DEBUG,   // Debug logging, used for internal debugging, it should be disabled on release builds
+    LOG_INFO,    // Info logging, used for program execution info
+    LOG_WARNING, // Warning logging, used on recoverable failures
+    LOG_ERROR,   // Error logging, used on unrecoverable failures
+    LOG_FATAL,   // Fatal logging, used to abort program: exit(EXIT_FAILURE)
+    LOG_NONE     // Disable logging
+} TraceLogLevel;
+
+//----------------------------------------------------------------------------------------------------------------------
 // Structures Definition
 //----------------------------------------------------------------------------------------------------------------------
 // Ensure boolean type
@@ -241,21 +256,6 @@ typedef struct PACKED RomHeader
     u8  checksum;        /**< 014D: Header checksum (x=0; for 0134-014C: x=x - byte - 1) */
     u16 global_checksum; /**< 014E-014F: ROM checksum (excluding self), not verified by boot ROM */
 } RomHeader;
-
-//----------------------------------------------------------------------------------------------------------------------
-// Enumerators Definition
-//----------------------------------------------------------------------------------------------------------------------
-typedef enum
-{
-    LOG_ALL = 0, // Display all logs
-    LOG_TRACE,   // Trace logging, intended for internal use only
-    LOG_DEBUG,   // Debug logging, used for internal debugging, it should be disabled on release builds
-    LOG_INFO,    // Info logging, used for program execution info
-    LOG_WARNING, // Warning logging, used on recoverable failures
-    LOG_ERROR,   // Error logging, used on unrecoverable failures
-    LOG_FATAL,   // Fatal logging, used to abort program: exit(EXIT_FAILURE)
-    LOG_NONE     // Disable logging
-} TraceLogLevel;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Functions Declaration
