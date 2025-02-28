@@ -32,7 +32,7 @@ u8
 BusRead( u16 addr )
 {
     // ROM data
-    if( addr < 0x8000 )
+    if( 0x8000 > addr )
         {
             return CartRead( addr );
         }
@@ -45,7 +45,7 @@ void
 BusWrite( u16 addr, u8 value )
 {
     // ROM data
-    if( addr < 0x8000 )
+    if( 0x8000 > addr )
         {
             CartWrite( addr, value );
             return;
