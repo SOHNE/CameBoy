@@ -22,6 +22,17 @@ typedef uint64_t u64;
 //----------------------------------------------------------------------------------------------------------------------
 // Defines
 //----------------------------------------------------------------------------------------------------------------------
+// C++ compatibility, preventing name mangling
+#if defined( __cplusplus )
+#    define CXX_GUARD_START                                                                                            \
+        extern "C"                                                                                                     \
+        {
+#    define CXX_GUARD_END }
+#else
+#    define CXX_GUARD_START
+#    define CXX_GUARD_END
+#endif
+
 #if defined( __cplusplus )
 #    define CLITERAL( type ) type
 #else
@@ -111,36 +122,31 @@ typedef enum bool
 // Functions Declaration
 //----------------------------------------------------------------------------------------------------------------------
 
-#if defined( __cplusplus )
-extern "C"
-{
-#endif
+CXX_GUARD_START
 
-    // Core
-    //------------------------------------------------------------------
-    CCAPI void Init( void );
+// Core
+//------------------------------------------------------------------
+CCAPI void Init( void );
 
-    // Bus
-    //------------------------------------------------------------------
-    CCAPI u8   BusRead( u16 addr );
-    CCAPI void BusWrite( u16 addr, u8 value );
+// Bus
+//------------------------------------------------------------------
+CCAPI u8   BusRead( u16 addr );
+CCAPI void BusWrite( u16 addr, u8 value );
 
-    // Cart
-    //------------------------------------------------------------------
-    CCAPI bool CartLoad( char * cart );
-    CCAPI u8   CartRead( u16 address );
-    CCAPI void CartWrite( u16 address, u8 value );
+// Cart
+//------------------------------------------------------------------
+CCAPI bool CartLoad( char * cart );
+CCAPI u8   CartRead( u16 address );
+CCAPI void CartWrite( u16 address, u8 value );
 
-    // Utils
-    //------------------------------------------------------------------
-    CCAPI void TraceLog( i32 logLevel, const char * text, ... );
-    CCAPI void SetLogLevel( i32 logLevel );
+// Utils
+//------------------------------------------------------------------
+CCAPI void TraceLog( i32 logLevel, const char * text, ... );
+CCAPI void SetLogLevel( i32 logLevel );
 
-    CCAPI u8 * LoadFileData( const char * filename, size_t * outBytesRead );
-    CCAPI bool SaveFileData( const char * filename, const u8 * data, size_t dataSize );
+CCAPI u8 * LoadFileData( const char * filename, size_t * outBytesRead );
+CCAPI bool SaveFileData( const char * filename, const u8 * data, size_t dataSize );
 
-#if defined( __cplusplus )
-}
-#endif
+CXX_GUARD_END
 
 #endif // !GBCE_H
