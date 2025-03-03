@@ -18,6 +18,7 @@ list(APPEND CB_SOURCE_FILES
     ${CB_SOURCE_DIR}/cart.c
     ${CB_SOURCE_DIR}/core.c
     ${CB_SOURCE_DIR}/cpu.c
+    ${CB_SOURCE_DIR}/cpu_proc.c
     ${CB_SOURCE_DIR}/instr.c
 )
 
@@ -69,6 +70,7 @@ set_target_properties(${PROJECT_NAME}
 #--------------------------------------------------------------------
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_compile_definitions(${PROJECT_NAME} PUBLIC CC_DEBUG)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC SUPPORT_LOG_DEBUG)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   target_compile_definitions(${PROJECT_NAME} PUBLIC CC_RELEASE)
 endif()
