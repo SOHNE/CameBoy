@@ -34,7 +34,7 @@ u8
 BusRead( u16 addr )
 {
     // Cartridge ROM: 0x0000–0x7FFF
-    if( BETWEEN( addr, ROM_BANK0_START, ROM_BANKN_END ) )
+    if( addr <= ROM_BANKN_END )
         {
             return CartRead( addr );
         }
@@ -47,7 +47,7 @@ void
 BusWrite( u16 addr, u8 value )
 {
     // Cartridge ROM: 0x0000–0x7FFF
-    if( BETWEEN( addr, ROM_BANK0_START, ROM_BANKN_END ) )
+    if( addr <= ROM_BANKN_END )
         {
             CartWrite( addr, value );
             return;
