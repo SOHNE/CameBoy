@@ -18,8 +18,10 @@ list(APPEND CB_SOURCE_FILES
     ${CB_SOURCE_DIR}/cart.c
     ${CB_SOURCE_DIR}/core.c
     ${CB_SOURCE_DIR}/cpu.c
+    ${CB_SOURCE_DIR}/cpu_fetch.c
+    ${CB_SOURCE_DIR}/cpu_instr.c
     ${CB_SOURCE_DIR}/cpu_proc.c
-    ${CB_SOURCE_DIR}/instr.c
+    ${CB_SOURCE_DIR}/cpu_util.c
 )
 
 #--------------------------------------------------------------------
@@ -35,9 +37,9 @@ add_sanitizers(${PROJECT_NAME})
 
 # Set compile flags
 target_compile_options(${PROJECT_NAME} PRIVATE
-    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Weverything>
-    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -fdiagnostics-color=always>
-    $<$<CXX_COMPILER_ID:MSVC>:/W4>
+    $<$<OR:$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>>:-Weverything>
+    $<$<C_COMPILER_ID:GNU>:-Wall -Wpedantic -Wextra -Werror -fdiagnostics-color=always>
+    $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
 )
 
 #--------------------------------------------------------------------
