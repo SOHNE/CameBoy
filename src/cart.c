@@ -71,10 +71,10 @@ typedef struct PACKED CartContext
 } CartContext;
 
 //----------------------------------------------------------------------------------------------------------------------
-// Variables Definition
+// Global Variables Definition
 //----------------------------------------------------------------------------------------------------------------------
 // Cart state context
-CartContext ctx = { 0 };
+CartContext cart_ctx = { 0 };
 
 // Kind of hardware is present on the cartridge
 static const char * ROM_TYPES[] = {
@@ -185,9 +185,9 @@ static const char * LIC_CODE[0xA5] = { [0x00] = "None",
 const char *
 GetCartTypeName( void )
 {
-    if( 0x22 >= ctx.rom.header->type )
+    if( 0x22 >= cart_ctx.rom.header->type )
         {
-            return ROM_TYPES[ctx.rom.header->type];
+            return ROM_TYPES[cart_ctx.rom.header->type];
         }
     return "UNKNOWN";
 }
@@ -196,9 +196,9 @@ GetCartTypeName( void )
 const char *
 GetCartLicenseeName( void )
 {
-    if( 0xA4 >= ctx.rom.header->new_lic_code )
+    if( 0xA4 >= cart_ctx.rom.header->new_lic_code )
         {
-            return LIC_CODE[ctx.rom.header->lic_code];
+            return LIC_CODE[cart_ctx.rom.header->lic_code];
         }
     return "UNKNOWN";
 }
@@ -212,7 +212,7 @@ GetHeaderChecksum( void * romData )
     unsigned short  checksumCalc = 0;
     unsigned char * romBytes     = (unsigned char *)romData;
 
-    for( size_t i = HEADER_CHECKSUM_START; i <= HEADER_CHECKSUM_END; i++ )
+    for( size_t i = HEADER_CHECKSUM_START; i <= HEADER_CHECKSUM_END; ++i )
         {
             checksumCalc = checksumCalc - romBytes[i] - 1;
         }
@@ -234,8 +234,8 @@ CartLoad( char * cartPath )
         }
 
     // Init context
-    memset( &ctx, 0, sizeof( ctx ) );
-    snprintf( ctx.rom.filename, sizeof( ctx.rom.filename ), "%s", cartPath );
+    memset( &cart_ctx, 0, sizeof( cart_ctx ) );
+    snprintf( cart_ctx.rom.filename, sizeof( cart_ctx.rom.filename ), "%s", cartPath );
 
     // Load cartrige file
     size_t          bytesRead = 0;
@@ -250,26 +250,26 @@ CartLoad( char * cartPath )
             return false;
         }
 
-    ctx.rom.size = bytesRead;
-    ctx.rom.data = fileData;
+    cart_ctx.rom.size = bytesRead;
+    cart_ctx.rom.data = fileData;
 
     // Setup header and null-terminate title
-    ctx.rom.header                                 = (RomHeader *)( (unsigned char *)ctx.rom.data + HEADER_OFFSET );
-    ctx.rom.header->title[HEADER_TITLE_STR_LENGTH] = '\0';
+    cart_ctx.rom.header = (RomHeader *)( (unsigned char *)cart_ctx.rom.data + HEADER_OFFSET );
+    cart_ctx.rom.header->title[HEADER_TITLE_STR_LENGTH] = '\0';
 
     // Verify checksum
-    const unsigned char calcChksum = GetHeaderChecksum( ctx.rom.data );
-    const bool          chkValid   = ( calcChksum == ctx.rom.header->checksum );
+    const unsigned char calcChksum = GetHeaderChecksum( cart_ctx.rom.data );
+    const bool          chkValid   = ( calcChksum == cart_ctx.rom.header->checksum );
 
-    // Log cart info (Yoda used in comparisons)
+    // Log cart info
     LOG( LOG_INFO, "Cartridge Loaded:" );
-    LOG( LOG_INFO, "    > Title    : %s", ctx.rom.header->title );
-    LOG( LOG_INFO, "    > Type     : %02X (%s)", ctx.rom.header->type, GetCartTypeName() );
-    LOG( LOG_INFO, "    > ROM Size : %zu KB", (size_t)( 32UL << ctx.rom.header->rom_size ) );
-    LOG( LOG_INFO, "    > RAM Size : %02X", ctx.rom.header->ram_size );
-    LOG( LOG_INFO, "    > LIC Code : %02X (%s)", ctx.rom.header->lic_code, GetCartLicenseeName() );
-    LOG( LOG_INFO, "    > ROM Vers : %02X", ctx.rom.header->version );
-    LOG( LOG_INFO, "    > Checksum : %02X (%s)", ctx.rom.header->checksum, ( true == chkValid ) ? "PASSED" : "FAILED" );
+    LOG( LOG_INFO, "    > Title    : %s", cart_ctx.rom.header->title );
+    LOG( LOG_INFO, "    > Type     : %02X (%s)", cart_ctx.rom.header->type, GetCartTypeName() );
+    LOG( LOG_INFO, "    > ROM Size : %zu KB", (size_t)( 32UL << cart_ctx.rom.header->rom_size ) );
+    LOG( LOG_INFO, "    > RAM Size : %02X", cart_ctx.rom.header->ram_size );
+    LOG( LOG_INFO, "    > LIC Code : %02X (%s)", cart_ctx.rom.header->lic_code, GetCartLicenseeName() );
+    LOG( LOG_INFO, "    > ROM Vers : %02X", cart_ctx.rom.header->version );
+    LOG( LOG_INFO, "    > Checksum : %02X (%s)", cart_ctx.rom.header->checksum, ( chkValid ) ? "PASSED" : "FAILED" );
 
     return true;
 }
@@ -277,14 +277,14 @@ CartLoad( char * cartPath )
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definition: Operations
 //----------------------------------------------------------------------------------------------------------------------
-// Perform read operation onto cartridge
+// Perform read operation on cartridge
 u8
 CartRead( u16 address )
 {
-    return ctx.rom.data[address];
+    return cart_ctx.rom.data[address];
 }
 
-// Perform write operation onto cartridge
+// Perform write operation on cartridge
 void
 CartWrite( u16 address, u8 value )
 {
