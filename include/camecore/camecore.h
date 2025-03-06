@@ -97,6 +97,8 @@ typedef uint64_t u64;
 #define BIT_TOGGLE( r, n )        ( ( r ) ^= BIT( n ) )
 #define BIT_CHECK( r, n )         ( ( r ) & BIT( n ) )
 
+#define BIT_ASSIGN( r, n, v )     ( ( v ) ? BIT_SET( ( r ), ( n ) ) : BIT_CLEAR( ( r ), ( n ) ) )
+
 // Flags operation macros
 #define FLAG_SET( n, f )          ( ( n ) |= ( f ) )
 #define FLAG_CLEAR( n, f )        ( ( n ) &= ~( f ) )
@@ -148,8 +150,17 @@ typedef uint64_t u64;
 
 #define IE_REGISTER               0xFFFF /**< Address of the Interrupt Enable Register */
 
-#define CPU_FLAG_Z                BIT( ctx->regs.f, 7 )
-#define CPU_FLAG_C                BIT( ctx->regs.f, 4 )
+// Flag bit positions
+#define FLAG_Z_BIT                7 /**< Zero flag */
+#define FLAG_N_BIT                6 /**< Subtract flag */
+#define FLAG_H_BIT                5 /**< Half-carry flag */
+#define FLAG_C_BIT                4 /**< Carry flag */
+
+// Flag bit masks
+#define FLAG_Z                    BIT( FLAG_Z_BIT )
+#define FLAG_N                    BIT( FLAG_N_BIT )
+#define FLAG_H                    BIT( FLAG_H_BIT )
+#define FLAG_C                    BIT( FLAG_C_BIT )
 
 //----------------------------------------------------------------------------------------------------------------------
 // Enumerators Definition
@@ -280,6 +291,14 @@ typedef enum
 //----------------------------------------------------------------------------------------------------------------------
 // Struct Definition
 //----------------------------------------------------------------------------------------------------------------------
+typedef struct EmuContext
+{
+    bool paused;
+    bool running;
+    bool die;
+    u64  ticks;
+} EmuContext;
+
 /**
  * @brief Instruction structure
  *
@@ -288,10 +307,10 @@ typedef enum
 typedef struct Instruction
 {
     InsType  type;
-    AddrMode mode;
-    RegType  reg_1;
-    RegType  reg_2;
-    CondType cond;
+    AddrMode addr_mode;
+    RegType  primary_reg;
+    RegType  secondary_reg;
+    CondType condition_type;
     u8       param;
 } Instruction;
 
@@ -299,7 +318,6 @@ typedef struct Instruction
  * @brief Structure for CPU registers
  *
  * The SM83 (Game Boy™'s CPU) uses 8-bit registers that can also be accessed as 16-bit.
- * Implementation details are hidden from the API user.
  *
  * Overview:
  * - Registers: A, F, B, C, D, E, H, L
@@ -340,10 +358,10 @@ typedef struct CPUContext
      */
     struct InstructionState
     {
-        u16           fetch_data;  /**< Data fetched for the current instruction */
-        u16           mem_dest;    /**< Memory destination address for the current operation */
-        bool          dest_is_mem; /**< Flag indicating if destination is memory (true) or register (false) */
-        u8            cur_opcode;  /**< Current instruction opcode being executed */
+        u16           fetched_data; /**< Data fetched for the current instruction */
+        u16           mem_dest;     /**< Memory destination address for the current operation */
+        bool          dest_is_mem;  /**< Flag indicating if destination is memory (true) or register (false) */
+        u8            cur_opcode;   /**< Current instruction opcode being executed */
         Instruction * cur_inst;
     } inst_state;
 
@@ -396,6 +414,10 @@ CXX_GUARD_START
 // Core
 //------------------------------------------------------------------
 CCAPI void Init( void );
+CCAPI bool Step( void );
+CCAPI void Cycles( u32 cpu_cycles );
+
+CCAPI bool EmulatorRunning( void );
 
 // Bus
 //------------------------------------------------------------------
