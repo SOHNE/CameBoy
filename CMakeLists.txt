@@ -7,6 +7,20 @@ project(
   HOMEPAGE_URL "https://github.com/SOHNE/CameBoy"
 )
 
+message(STATUS "======================================================================================")
+message(STATUS " Copyright (c) 2025                                   SOHNE, Leandro Peres (@zschzen) ")
+message(STATUS "======================================================================================")
+message(STATUS "                                                                                      ")
+message(STATUS "  _|_|_|                                        _|_|_|                                ")
+message(STATUS "_|          _|_|_|  _|_|_|  _|_|      _|_|    _|          _|_|    _|  _|_|    _|_|    ")
+message(STATUS "_|        _|    _|  _|    _|    _|  _|_|_|_|  _|        _|    _|  _|_|      _|_|_|_|  ")
+message(STATUS "_|        _|    _|  _|    _|    _|  _|        _|        _|    _|  _|        _|        ")
+message(STATUS "  _|_|_|    _|_|_|  _|    _|    _|    _|_|_|    _|_|_|    _|_|    _|          _|_|_|  ")
+message(STATUS " v${PROJECT_VERSION}                                                                  ")
+message(STATUS "                                                                                      ")
+message(STATUS "======================================================================================")
+message(STATUS " https://sohne.github.io/CameCore                                zlib/libpng licensed ")
+
 # Determine if LuGL is the main project
 set(CB_IS_MAIN ${PROJECT_IS_TOP_LEVEL})
 
@@ -30,7 +44,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 # --------------------------------------------------------------------
 # Dependencies
 # --------------------------------------------------------------------
-message(STATUS "========================================================================= ")
+message(STATUS "======================================================================================")
 message(STATUS "> CPM.cmake")
 
 include(cmake/CPM.cmake)
@@ -82,4 +96,4 @@ cpm_licenses_create_disclaimer_target(
   write-licenses "${CMAKE_CURRENT_BINARY_DIR}/third_party.txt" "${CPM_PACKAGES}"
 )
 
-message(STATUS "========================================================================= ")
+message(STATUS "======================================================================================")
