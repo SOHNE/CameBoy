@@ -107,6 +107,22 @@ typedef uint64_t u64;
 #define FLAG_TOGGLE( n, f )       ( ( n ) ^= ( f ) )
 #define FLAG_CHECK( n, f )        ( ( n ) & ( f ) )
 
+// Flag bit positions
+#define FLAG_Z_BIT                7 /**< Zero flag */
+#define FLAG_N_BIT                6 /**< Subtract flag */
+#define FLAG_H_BIT                5 /**< Half-carry flag */
+#define FLAG_C_BIT                4 /**< Carry flag */
+
+// Registers Flag bit masks
+#define FLAG_Z                    BIT( FLAG_Z_BIT )
+#define FLAG_N                    BIT( FLAG_N_BIT )
+#define FLAG_H                    BIT( FLAG_H_BIT )
+#define FLAG_C                    BIT( FLAG_C_BIT )
+
+// Array
+#define ARRAY_LEN( a )            ( sizeof( ( a ) ) / sizeof( ( a )[0] ) )
+#define INDEX_VALID( i, a )       ( ( i ) >= 0 && (size_t)( i ) < ARRAY_LEN( a ) )
+
 // Memory ranges
 #define ROM_BANK_SIZE             0x4000 /**< Size of each ROM bank (16 KiB) */
 #define ROM_BANK0_START           0x0000 /**< Start address of fixed ROM bank 0 */
@@ -151,18 +167,6 @@ typedef uint64_t u64;
 #define HRAM_END                  0xFFFE /**< End address of High RAM */
 
 #define IE_REGISTER               0xFFFF /**< Address of the Interrupt Enable Register */
-
-// Flag bit positions
-#define FLAG_Z_BIT                7 /**< Zero flag */
-#define FLAG_N_BIT                6 /**< Subtract flag */
-#define FLAG_H_BIT                5 /**< Half-carry flag */
-#define FLAG_C_BIT                4 /**< Carry flag */
-
-// Flag bit masks
-#define FLAG_Z                    BIT( FLAG_Z_BIT )
-#define FLAG_N                    BIT( FLAG_N_BIT )
-#define FLAG_H                    BIT( FLAG_H_BIT )
-#define FLAG_C                    BIT( FLAG_C_BIT )
 
 //----------------------------------------------------------------------------------------------------------------------
 // Enumerators Definition
