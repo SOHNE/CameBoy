@@ -69,7 +69,7 @@ ProcJP( CPUContext * cpu_ctx )
     if( CheckCond( cpu_ctx ) )
         {
             cpu_ctx->regs.pc = cpu_ctx->inst_state.fetched_data;
-            Cycles( 1 );
+            AddEmulatorCycles( 1 );
         }
 }
 

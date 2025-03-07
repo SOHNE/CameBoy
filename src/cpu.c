@@ -60,7 +60,7 @@ CPUStep( void )
                 const CPURegisters regs = cpu_ctx.regs;
                 LOG( LOG_INFO, "%04X: %-7s (%02X %02X %02X) A: %02X B: %02X C: %02X", regs.pc,
                      GetInstructionName( cpu_ctx.inst_state.cur_inst->type ), cpu_ctx.inst_state.cur_opcode,
-                     BusRead( regs.pc + 1 ), BusRead( regs.pc + 2 ), regs.a, regs.b, regs.c );
+                     ReadBus( regs.pc + 1 ), ReadBus( regs.pc + 2 ), regs.a, regs.b, regs.c );
             }
 
             if( NULL == cpu_ctx.inst_state.cur_inst )

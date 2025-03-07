@@ -225,7 +225,7 @@ GetHeaderChecksum( void * romData )
 //----------------------------------------------------------------------------------------------------------------------
 // Loads the cartridge into `CartContext`
 bool
-CartLoad( char * cartPath )
+LoadCartridge( char * cartPath )
 {
     if( false == IS_STR_VALID( cartPath ) )
         {
@@ -279,14 +279,14 @@ CartLoad( char * cartPath )
 //----------------------------------------------------------------------------------------------------------------------
 // Perform read operation on cartridge
 u8
-CartRead( u16 address )
+ReadCartridge( u16 address )
 {
     return cart_ctx.rom.data[address];
 }
 
 // Perform write operation on cartridge
 void
-CartWrite( u16 address, u8 value )
+WriteCartridge( u16 address, u8 value )
 {
     UNUSED( address );
     UNUSED( value );

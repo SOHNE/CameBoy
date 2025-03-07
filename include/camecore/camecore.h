@@ -413,22 +413,22 @@ CXX_GUARD_START
 
 // Core
 //------------------------------------------------------------------
-CCAPI void Init( void );
-CCAPI bool Step( void );
-CCAPI void Cycles( u32 cpu_cycles );
+CCAPI void InitEmulator( void );
+CCAPI bool StepEmulator( void );
+CCAPI void AddEmulatorCycles( u32 cpu_cycles );
 
-CCAPI bool EmulatorRunning( void );
+CCAPI bool IsEmulatorRunning( void );
 
 // Bus
 //------------------------------------------------------------------
-CCAPI u8   BusRead( u16 addr );
-CCAPI void BusWrite( u16 addr, u8 value );
+CCAPI u8   ReadBus( u16 addr );
+CCAPI void WriteBus( u16 addr, u8 value );
 
 // Cart
 //------------------------------------------------------------------
-CCAPI bool CartLoad( char * cart );
-CCAPI u8   CartRead( u16 address );
-CCAPI void CartWrite( u16 address, u8 value );
+CCAPI bool LoadCartridge( char * cart );
+CCAPI u8   ReadCartridge( u16 address );
+CCAPI void WriteCartridge( u16 address, u8 value );
 
 // Utils
 //------------------------------------------------------------------

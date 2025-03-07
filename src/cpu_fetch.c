@@ -19,11 +19,11 @@ extern u16           GetRegister( RegType rt );           // Get the given regis
 static inline u16
 FETCH_LO_HI( u16 pc )
 {
-    u8 lo = BusRead( pc );
-    Cycles( 1 );
+    u8 lo = ReadBus( pc );
+    AddEmulatorCycles( 1 );
 
-    u8 hi = BusRead( pc + 1 );
-    Cycles( 1 );
+    u8 hi = ReadBus( pc + 1 );
+    AddEmulatorCycles( 1 );
 
     return lo | ( hi << 8 );
 }
@@ -35,7 +35,7 @@ FETCH_LO_HI( u16 pc )
 void
 FetchInstruction( void )
 {
-    cpu_ctx.inst_state.cur_opcode = BusRead( cpu_ctx.regs.pc++ );
+    cpu_ctx.inst_state.cur_opcode = ReadBus( cpu_ctx.regs.pc++ );
     cpu_ctx.inst_state.cur_inst   = GetInstructionByOpCode( cpu_ctx.inst_state.cur_opcode );
 }
 
@@ -62,8 +62,8 @@ FetchData( void )
             case AM_R_D8:
                 /** Register + 8-bit immediate */
                 {
-                    cpu_ctx.inst_state.fetched_data = BusRead( cpu_ctx.regs.pc );
-                    Cycles( 1 );
+                    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
+                    AddEmulatorCycles( 1 );
                     ++cpu_ctx.regs.pc;
                     return;
                 }

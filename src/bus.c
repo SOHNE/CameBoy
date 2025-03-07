@@ -31,12 +31,12 @@
 // Module Functions Definition
 //----------------------------------------------------------------------------------------------------------------------
 u8
-BusRead( u16 addr )
+ReadBus( u16 addr )
 {
     // Cartridge ROM: 0x0000–0x7FFF
     if( addr <= ROM_BANKN_END )
         {
-            return CartRead( addr );
+            return ReadCartridge( addr );
         }
 
     NO_IMPL();
@@ -44,12 +44,12 @@ BusRead( u16 addr )
 }
 
 void
-BusWrite( u16 addr, u8 value )
+WriteBus( u16 addr, u8 value )
 {
     // Cartridge ROM: 0x0000–0x7FFF
     if( addr <= ROM_BANKN_END )
         {
-            CartWrite( addr, value );
+            WriteCartridge( addr, value );
             return;
         }
 

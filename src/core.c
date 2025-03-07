@@ -17,7 +17,7 @@ extern bool CPUStep( void );
 //----------------------------------------------------------------------------------------------------------------------
 // Initialize the emulation
 void
-Init( void )
+InitEmulator( void )
 {
     LOG( LOG_INFO, "Initializing CameCore %s", CAMECORE_VERSION );
 
@@ -30,7 +30,7 @@ Init( void )
 
 // Step once the emulation execution
 bool
-Step( void )
+StepEmulator( void )
 {
     if( false == CPUStep() )
         {
@@ -44,14 +44,14 @@ Step( void )
 
 // TODO: Process N CPU cycles (4 ticks/cycle: timers+PPU+APU per tick, DMA post-cycle)
 void
-Cycles( u32 cpu_cycles )
+AddEmulatorCycles( u32 cpu_cycles )
 {
     UNUSED( cpu_cycles );
 }
 
 // Get the current running state of the emulation
 bool
-EmulatorRunning( void )
+IsEmulatorRunning( void )
 {
     return ctx.running;
 }
