@@ -126,21 +126,23 @@ ProcJP( CPUContext * cpu_ctx )
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Global Variables Definition
+//----------------------------------------------------------------------------------------------------------------------
+// Define the processors array and populate it with instruction processor functions.
+#define PROC( name ) [INS_##name] = Proc##name
+
+static CPUInstructionProc PROCESSORS[] = {
+    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( XOR ),
+};
+
+#undef PROC
+
+//----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definitions
 //----------------------------------------------------------------------------------------------------------------------
-//Retrieve the given instruction execution method
+// Retrieve the given instruction execution method
 CPUInstructionProc
 GetInstructionProcessor( InsType type )
 {
-    switch( type )
-        {
-            case INS_NONE: return ProcNONE;
-            case INS_NOP:  return ProcNOP;
-            case INS_LD:   return ProcLD;
-            case INS_JP:   return ProcJP;
-            case INS_DI:   return ProcDI;
-            case INS_XOR:  return ProcXOR;
-
-            default:       return ProcNONE;
-        }
+    return PROCESSORS[type];
 }
