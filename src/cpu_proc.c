@@ -11,41 +11,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Definitions
 //----------------------------------------------------------------------------------------------------------------------
-static void
-ProcNONE( CPUContext * cpu_ctx )
-{
-    UNUSED( cpu_ctx );
-    LOG( LOG_FATAL, "INVALID INSTRUCTION" );
-}
-
-static void
-ProcNOP( CPUContext * cpu_ctx )
-{
-    UNUSED( cpu_ctx );
-}
-
-static void
-ProcDI( CPUContext * cpu_ctx )
-{
-    cpu_ctx->interupt_state.ime = false;
-}
-
-static void
-ProcLD( CPUContext * cpu_ctx )
-{
-    UNUSED( cpu_ctx );
-}
-
-static void
-ProcXOR( CPUContext * cpu_ctx )
-{
-    cpu_ctx->regs.a ^= ( cpu_ctx->inst_state.fetched_data & 0xFF );
-    SET_FLAG( Z, cpu_ctx->regs.a == 0 );
-    SET_FLAG( N, 0 );
-    SET_FLAG( H, 0 );
-    SET_FLAG( C, 0 );
-}
-
+// Return the check condition based on the given current instruction condition type
 static bool
 CheckCond( CPUContext * cpu_ctx )
 {
@@ -63,14 +29,100 @@ CheckCond( CPUContext * cpu_ctx )
     return false;
 }
 
+// Instructions Definition
+//------------------------------------------------------------------
+/**
+ * Invalid Instruction Handler
+ *
+ * Logs a fatal error when an invalid/unimplemented opcode is encountered.
+ * Does not modify any CPU state or flags.
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcNONE( CPUContext * cpu_ctx )
+{
+    UNUSED( cpu_ctx );
+    LOG( LOG_FATAL, "INVALID INSTRUCTION" );
+}
+
+/*
+ * Mnemonic    : NOP
+ * Instruction : Only advances the program counter by 1.
+ * Function    :
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcNOP( CPUContext * cpu_ctx )
+{
+    UNUSED( cpu_ctx );
+}
+
+/*
+ * Mnemonic    : DI
+ * Instruction : Reset the interrupt master enable (IME) flag
+ * Function    : IME = 0
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcDI( CPUContext * cpu_ctx )
+{
+    cpu_ctx->interupt_state.ime = false;
+}
+
+/*
+ * Mnemonic    : LD
+ * Instruction : Load
+ * Function    : R = O
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcLD( CPUContext * cpu_ctx )
+{
+    UNUSED( cpu_ctx );
+}
+
+/*
+ * Mnemonic    : XOR
+ * Instruction : Logical Exclusive OR
+ * Function    : A = A ^ OP
+ *
+ * Z N H C
+ * + 0 0 0
+ */
+static void
+ProcXOR( CPUContext * cpu_ctx )
+{
+    cpu_ctx->regs.a ^= LOW_BYTE( cpu_ctx->inst_state.fetched_data );
+
+    SET_FLAG( Z, cpu_ctx->regs.a == 0 );
+    SET_FLAG( N, 0 );
+    SET_FLAG( H, 0 );
+    SET_FLAG( C, 0 );
+}
+
+/*
+ * Mnemonic    : JP
+ * Instruction : Jump To Location
+ * Function    : pc = address
+ *
+ * Z N H C
+ * - - - -
+ */
 static void
 ProcJP( CPUContext * cpu_ctx )
 {
-    if( CheckCond( cpu_ctx ) )
-        {
-            cpu_ctx->regs.pc = cpu_ctx->inst_state.fetched_data;
-            AddEmulatorCycles( 1 );
-        }
+    if( false == CheckCond( cpu_ctx ) ) return;
+
+    cpu_ctx->regs.pc = cpu_ctx->inst_state.fetched_data;
+    AddEmulatorCycles( 1 );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
