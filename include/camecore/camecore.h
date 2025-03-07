@@ -1,5 +1,59 @@
-#ifndef GBCE_H
-#define GBCE_H
+/****************************** CameCore *********************************
+ *
+ * Version:    v0.0.1                   Author: Leandro Peres (@zschzen)
+ * Released:   2025-03-07               License: zlib/libpng (OSI Approved)
+ *
+ * An ultra simple (and not complete) Game Boy™ emulator:
+ * - Educational purposes and emulation fundamentals
+ * - C99 development workflows
+ *
+ *                            QUICK START
+ * ------------------------------------------------------------------------
+ * #include "camecore/camecore.h"
+ *
+ * int main(void) {
+ *     // Initialize the emulator system
+ *     InitEmulator();
+ *
+ *     // Attempt to load a cartridge file (replace "path/to/cartridge.bin" with your file)
+ *     if (!LoadCartridge("path/to/cartridge.bin")) {
+ *         return 1;
+ *     }
+ *
+ *     // Main emulation loop
+ *     while (IsEmulatorRunning()) {
+ *         // Execute one emulation step
+ *         if (!StepEmulator()) {
+ *             break;
+ *         }
+ *     }
+ *
+ *     return 0;
+ * }
+ *
+ *                               LICENSE
+ * ------------------------------------------------------------------------
+ * Copyright (c) 2025 SOHNE, Leandro Peres (@zschzen)
+ *
+ * This software is provided "as-is", without any express or implied warranty. In no event
+ * will the authors be held liable for any damages arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose, including commercial
+ * applications, and to alter it and redistribute it freely, subject to the following restrictions:
+ *
+ *   1. The origin of this software must not be misrepresented; you must not claim that you
+ *   wrote the original software. If you use this software in a product, an acknowledgment
+ *   in the product documentation would be appreciated but is not required.
+ *
+ *   2. Altered source versions must be plainly marked as such, and must not be misrepresented
+ *   as being the original software.
+ *
+ *   3. This notice may not be removed or altered from any source distribution.
+ *
+ *************************************************************************/
+
+#ifndef CAMECORE_H
+#define CAMECORE_H
 
 #include "camecore/version.h"
 #include "ccapi.h"
@@ -446,4 +500,4 @@ CCAPI bool SaveFileData( const char * filename, const u8 * data, size_t dataSize
 
 CXX_GUARD_END
 
-#endif // !GBCE_H
+#endif // !CAMECORE_H
