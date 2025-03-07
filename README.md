@@ -34,7 +34,8 @@
 
 > _**This project** serves as my experimental platform to delve into emulation's core principles. As a personal endeavor aimed at hands-on learning, it doesn't fully mirror the original hardware's intricacies. I welcome any contributions or suggestions. Feel free to explore the code, report issues, or submit pull requests._
 
-> ⚠️ _This repository does not include nor endorse the use of illegal ROMs. Users are responsible for ensuring they have the legal right to use ~any~ ROMs with this software._ ⚠️ 
+> [!IMPORTANT]
+> This repository does not include nor endorse the use of illegal ROMs. Users are responsible for ensuring they have the legal right to use ~any~ ROMs with this software.
 
 <details open>
 <summary>
