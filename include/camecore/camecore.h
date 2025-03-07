@@ -96,8 +96,10 @@ typedef uint64_t u64;
 #define BIT_CLEAR( r, n )         ( ( r ) &= ~BIT( n ) )
 #define BIT_TOGGLE( r, n )        ( ( r ) ^= BIT( n ) )
 #define BIT_CHECK( r, n )         ( ( r ) & BIT( n ) )
-
 #define BIT_ASSIGN( r, n, v )     ( ( v ) ? BIT_SET( ( r ), ( n ) ) : BIT_CLEAR( ( r ), ( n ) ) )
+
+#define LOW_BYTE( val )           ( ( val ) & 0xFF )          /**< Get least significant byte */
+#define HIGH_BYTE( val )          ( ( ( val ) >> 8 ) & 0xFF ) /**< Get most significant byte */
 
 // Flags operation macros
 #define FLAG_SET( n, f )          ( ( n ) |= ( f ) )
