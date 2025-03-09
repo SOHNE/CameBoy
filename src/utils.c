@@ -58,9 +58,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 static int logLevel = LOG_INFO;
 
+// Callbacks
+static TraceLogCallback traceLog = NULL;
+
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definition: Utilities
 //----------------------------------------------------------------------------------------------------------------------
+void
+SetTraceLogCallback( TraceLogCallback callback )
+{
+    traceLog = callback;
+}
+
 void
 SetLogLevel( i32 logType )
 {
@@ -70,31 +79,42 @@ SetLogLevel( i32 logType )
 void
 TraceLog( i32 logType, const char * text, ... )
 {
+    va_list      args;
+    const char * levelString;
+
+    // Skip logging
     if( logType < logLevel ) return;
 
-    char levelStr[8];
+    va_start( args, text );
 
-    // Determine the log level string safely
-    switch( logType )
+    // Use custom callback if available
+    if( traceLog != NULL )
         {
-            case LOG_TRACE:   strcpy( levelStr, "TRACE" ); break;
-            case LOG_DEBUG:   strcpy( levelStr, "DEBUG" ); break;
-            case LOG_INFO:    strcpy( levelStr, "INFO" ); break;
-            case LOG_WARNING: strcpy( levelStr, "WARNING" ); break;
-            case LOG_ERROR:   strcpy( levelStr, "ERROR" ); break;
-            case LOG_FATAL:   strcpy( levelStr, "FATAL" ); break;
-            default:          strcpy( levelStr, "UNKNOWN" ); break;
+            traceLog( logType, text, args );
+            va_end( args );
+            return;
         }
 
-    fprintf( stderr, "[%s] ", levelStr );
+    // Default logging behavior - determine log level string
+    switch( logType )
+        {
+            case LOG_TRACE:   levelString = "TRACE"; break;
+            case LOG_DEBUG:   levelString = "DEBUG"; break;
+            case LOG_INFO:    levelString = "INFO"; break;
+            case LOG_WARNING: levelString = "WARNING"; break;
+            case LOG_ERROR:   levelString = "ERROR"; break;
+            case LOG_FATAL:   levelString = "FATAL"; break;
+            default:          levelString = "UNKNOWN"; break;
+        }
 
-    va_list args;
-    va_start( args, text );
+    // Print log message
+    fprintf( stderr, "[%s] ", levelString );
     vfprintf( stderr, text, args );
-    va_end( args );
-
     fprintf( stderr, "\n" );
 
+    va_end( args );
+
+    // Handle fatal errors
     if( logType == LOG_FATAL ) abort();
 }
 

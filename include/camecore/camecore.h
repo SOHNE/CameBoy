@@ -58,6 +58,7 @@
 #include "camecore/version.h"
 #include "ccapi.h"
 
+#include <stdarg.h> /** va_list */
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -461,9 +462,10 @@ typedef struct CPUContext
 } CPUContext;
 
 //----------------------------------------------------------------------------------------------------------------------
-// Internal functions callbacks
+// Functions callbacks
 //----------------------------------------------------------------------------------------------------------------------
 typedef void ( *CPUInstructionProc )( CPUContext * /* ctx */ );
+typedef void ( *TraceLogCallback )( int logLevel, const char * text, va_list args ); // Custom trace log
 
 //----------------------------------------------------------------------------------------------------------------------
 // Functions Declaration
@@ -499,6 +501,8 @@ CCAPI void SetLogLevel( i32 logLevel );
 
 CCAPI u8 * LoadFileData( const char * filename, size_t * outBytesRead );
 CCAPI bool SaveFileData( const char * filename, const u8 * data, size_t dataSize );
+
+CCAPI void SetTraceLogCallback( TraceLogCallback callback ); // Set custom trace log
 
 CXX_GUARD_END
 
