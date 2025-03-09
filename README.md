@@ -73,4 +73,6 @@
 
 ## License
 
+CameCore and CameBoy are licensed under zlib/libpng license, an OSI-certified and BSD-like license. Check [LICENSE](LICENSE) for details.
+
 ---
