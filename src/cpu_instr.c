@@ -42,7 +42,7 @@ char *        GetInstructionName( InsType t );
 // Variables Definition
 //----------------------------------------------------------------------------------------------------------------------
 // Initialize the instructions table indexed by opcode (0x00 to 0xFF)
-static const Instruction instructions[0x100] = {
+static Instruction instructions[0x100] = {
     /**           MNE,      AM,    1REG,    2REG,    COND,  ARGS */
     [0x00] = {INS_NOP,  AM_IMP, RT_NONE, RT_NONE, CT_NONE, 0x00},
 
@@ -57,7 +57,7 @@ static const Instruction instructions[0x100] = {
     [0xF3] = { INS_DI,  AM_IMP, RT_NONE, RT_NONE, CT_NONE, 0x00}
 };
 
-static const char * inst_lookup[] = {
+static char * inst_lookup[] = {
     "<NONE>", "NOP",     "LD",      "INC",      "DEC",     "RLCA",    "ADD",     "RRCA",    "STOP",    "RLA",
     "JR",     "RRA",     "DAA",     "CPL",      "SCF",     "CCF",     "HALT",    "ADC",     "SUB",     "SBC",
     "AND",    "XOR",     "OR",      "CP",       "POP",     "JP",      "PUSH",    "RET",     "CB",      "CALL",
