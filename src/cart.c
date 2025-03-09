@@ -151,73 +151,75 @@ static const char * ROM_TYPES[] = {
 };
 
 // ASCII “licensee code” indicating the game’s publisher
-static const char * LIC_CODE[0xA5] = { [0x00] = "None",
-                                       [0x01] = "Nintendo R&D1",
-                                       [0x08] = "Capcom",
-                                       [0x13] = "Electronic Arts",
-                                       [0x18] = "Hudson Soft",
-                                       [0x19] = "b-ai",
-                                       [0x20] = "kss",
-                                       [0x22] = "pow",
-                                       [0x24] = "PCM Complete",
-                                       [0x25] = "san-x",
-                                       [0x28] = "Kemco Japan",
-                                       [0x29] = "seta",
-                                       [0x30] = "Viacom",
-                                       [0x31] = "Nintendo",
-                                       [0x32] = "Bandai",
-                                       [0x33] = "Ocean/Acclaim",
-                                       [0x34] = "Konami",
-                                       [0x35] = "Hector",
-                                       [0x37] = "Taito",
-                                       [0x38] = "Hudson",
-                                       [0x39] = "Banpresto",
-                                       [0x41] = "Ubi Soft",
-                                       [0x42] = "Atlus",
-                                       [0x44] = "Malibu",
-                                       [0x46] = "angel",
-                                       [0x47] = "Bullet-Proof",
-                                       [0x49] = "irem",
-                                       [0x50] = "Absolute",
-                                       [0x51] = "Acclaim",
-                                       [0x52] = "Activision",
-                                       [0x53] = "American sammy",
-                                       [0x54] = "Konami",
-                                       [0x55] = "Hi tech entertainment",
-                                       [0x56] = "LJN",
-                                       [0x57] = "Matchbox",
-                                       [0x58] = "Mattel",
-                                       [0x59] = "Milton Bradley",
-                                       [0x60] = "Titus",
-                                       [0x61] = "Virgin",
-                                       [0x64] = "LucasArts",
-                                       [0x67] = "Ocean",
-                                       [0x69] = "Electronic Arts",
-                                       [0x70] = "Infogrames",
-                                       [0x71] = "Interplay",
-                                       [0x72] = "Broderbund",
-                                       [0x73] = "sculptured",
-                                       [0x75] = "sci",
-                                       [0x78] = "THQ",
-                                       [0x79] = "Accolade",
-                                       [0x80] = "misawa",
-                                       [0x83] = "lozc",
-                                       [0x86] = "Tokuma Shoten Intermedia",
-                                       [0x87] = "Tsukuda Original",
-                                       [0x91] = "Chunsoft",
-                                       [0x92] = "Video system",
-                                       [0x93] = "Ocean/Acclaim",
-                                       [0x95] = "Varie",
-                                       [0x96] = "Yonezawa/s’pal",
-                                       [0x97] = "Kaneko",
-                                       [0x99] = "Pack in soft",
-                                       [0xA4] = "Konami (Yu-Gi-Oh!)" };
+static const char * LIC_CODE[0xA5] = {
+    [0x00] = "None",
+    [0x01] = "Nintendo R&D1",
+    [0x08] = "Capcom",
+    [0x13] = "Electronic Arts",
+    [0x18] = "Hudson Soft",
+    [0x19] = "b-ai",
+    [0x20] = "kss",
+    [0x22] = "pow",
+    [0x24] = "PCM Complete",
+    [0x25] = "san-x",
+    [0x28] = "Kemco Japan",
+    [0x29] = "seta",
+    [0x30] = "Viacom",
+    [0x31] = "Nintendo",
+    [0x32] = "Bandai",
+    [0x33] = "Ocean/Acclaim",
+    [0x34] = "Konami",
+    [0x35] = "Hector",
+    [0x37] = "Taito",
+    [0x38] = "Hudson",
+    [0x39] = "Banpresto",
+    [0x41] = "Ubi Soft",
+    [0x42] = "Atlus",
+    [0x44] = "Malibu",
+    [0x46] = "angel",
+    [0x47] = "Bullet-Proof",
+    [0x49] = "irem",
+    [0x50] = "Absolute",
+    [0x51] = "Acclaim",
+    [0x52] = "Activision",
+    [0x53] = "American sammy",
+    [0x54] = "Konami",
+    [0x55] = "Hi tech entertainment",
+    [0x56] = "LJN",
+    [0x57] = "Matchbox",
+    [0x58] = "Mattel",
+    [0x59] = "Milton Bradley",
+    [0x60] = "Titus",
+    [0x61] = "Virgin",
+    [0x64] = "LucasArts",
+    [0x67] = "Ocean",
+    [0x69] = "Electronic Arts",
+    [0x70] = "Infogrames",
+    [0x71] = "Interplay",
+    [0x72] = "Broderbund",
+    [0x73] = "sculptured",
+    [0x75] = "sci",
+    [0x78] = "THQ",
+    [0x79] = "Accolade",
+    [0x80] = "misawa",
+    [0x83] = "lozc",
+    [0x86] = "Tokuma Shoten Intermedia",
+    [0x87] = "Tsukuda Original",
+    [0x91] = "Chunsoft",
+    [0x92] = "Video system",
+    [0x93] = "Ocean/Acclaim",
+    [0x95] = "Varie",
+    [0x96] = "Yonezawa/s’pal",
+    [0x97] = "Kaneko",
+    [0x99] = "Pack in soft",
+    [0xA4] = "Konami (Yu-Gi-Oh!)",
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definition: Getters
 //----------------------------------------------------------------------------------------------------------------------
 // Get the hardware that is present on the cartridge based on `LIC_CODE` lookup table
-const char *
+static const char *
 GetCartTypeName( void )
 {
     if( 0x22 >= cart_ctx.rom.header->type )
@@ -228,7 +230,7 @@ GetCartTypeName( void )
 }
 
 // Get cart game’s publisher based on `ROM_TYPES` lookup table
-const char *
+static const char *
 GetCartLicenseeName( void )
 {
     if( 0xA4 >= cart_ctx.rom.header->new_lic_code )
@@ -241,7 +243,7 @@ GetCartLicenseeName( void )
 // Get the calculated header check sum
 // NOTE: If the byte at $014D does not match the lower 8 bits of checksum,
 // the boot ROM will lock up and the program in the cartridge won’t run.
-unsigned char
+static unsigned char
 GetHeaderChecksum( void * romData )
 {
     unsigned short  checksumCalc = 0;
@@ -262,6 +264,11 @@ GetHeaderChecksum( void * romData )
 bool
 LoadCartridge( char * cartPath )
 {
+    size_t        bytesRead;
+    u8 *          fileData;
+    unsigned char calcChksum;
+    bool          chkValid;
+
     if( false == IS_STR_VALID( cartPath ) )
         {
             LOG( LOG_ERROR, "Invalid cartridge filename." );
@@ -273,8 +280,7 @@ LoadCartridge( char * cartPath )
     snprintf( cart_ctx.rom.filename, sizeof( cart_ctx.rom.filename ), "%s", cartPath );
 
     // Load cartrige file
-    size_t          bytesRead = 0;
-    uint8_t * const fileData  = LoadFileData( cartPath, &bytesRead );
+    fileData = LoadFileData( cartPath, &bytesRead );
     if( NULL == fileData || 0 == bytesRead ) return false;
 
     // Validate file size
@@ -289,12 +295,12 @@ LoadCartridge( char * cartPath )
     cart_ctx.rom.data = fileData;
 
     // Setup header and null-terminate title
-    cart_ctx.rom.header = (RomHeader *)( (unsigned char *)cart_ctx.rom.data + HEADER_OFFSET );
-    cart_ctx.rom.header->title[HEADER_TITLE_STR_LENGTH] = '\0';
+    cart_ctx.rom.header = (RomHeader *)( ( (uintptr_t)cart_ctx.rom.data ) + HEADER_OFFSET );
+    cart_ctx.rom.header->title[sizeof( cart_ctx.rom.header->title ) - 1] = '\0';
 
     // Verify checksum
-    const unsigned char calcChksum = GetHeaderChecksum( cart_ctx.rom.data );
-    const bool          chkValid   = ( calcChksum == cart_ctx.rom.header->checksum );
+    calcChksum = GetHeaderChecksum( cart_ctx.rom.data );
+    chkValid   = ( calcChksum == cart_ctx.rom.header->checksum );
 
     // Log cart info
     LOG( LOG_INFO, "Cartridge Loaded:" );

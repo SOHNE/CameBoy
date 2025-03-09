@@ -43,6 +43,10 @@ extern CPUContext cpu_ctx;
 //----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Declarations
 //----------------------------------------------------------------------------------------------------------------------
+// CPU Fetch
+void FetchInstruction( void );
+void FetchData( void );
+
 extern Instruction * GetInstructionByOpCode( u8 opcode ); // Get the given opcode `Instruction`
 extern u16           GetRegister( RegType rt );           // Get the given register data
 
@@ -53,13 +57,18 @@ extern u16           GetRegister( RegType rt );           // Get the given regis
 static inline u16
 FETCH_LO_HI( u16 pc )
 {
-    u8 lo = ReadBus( pc );
+    u8 lo;
+    u8 hi;
+
+    /* Get low byte */
+    lo = ReadBus( pc );
     AddEmulatorCycles( 1 );
 
-    u8 hi = ReadBus( pc + 1 );
+    /* Get high byte */
+    hi = ReadBus( pc + 1 );
     AddEmulatorCycles( 1 );
 
-    return lo | ( hi << 8 );
+    return (u16)( lo | ( hi << 8 ) );
 }
 
 //----------------------------------------------------------------------------------------------------------------------

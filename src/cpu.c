@@ -39,6 +39,13 @@
 #include "camecore/utils.h"
 
 //----------------------------------------------------------------------------------------------------------------------
+// Module Defines and Macros
+//----------------------------------------------------------------------------------------------------------------------
+// Flag access
+#define GET_FLAG( flag )  BIT_CHECK( cpu_ctx.regs.f, FLAG_##flag##_BIT )
+#define FLAG_CHAR( flag ) ( GET_FLAG( flag ) ? #flag[0] : '-' )
+
+//----------------------------------------------------------------------------------------------------------------------
 // Global Variables Definition
 //----------------------------------------------------------------------------------------------------------------------
 CPUContext cpu_ctx = { 0 };
@@ -55,6 +62,10 @@ extern char *             GetInstructionName( InsType t );         // Get the gi
 // NOTE: Defined in `cpu_fetch.c`
 extern void FetchInstruction( void ); // Fetch next instruction
 extern void FetchData( void );        // Fetch current instruction data
+
+// CPU actions
+void CPUInit( void );
+bool CPUStep( void );
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Definitions
@@ -93,11 +104,17 @@ CPUStep( void )
             FetchInstruction();
             FetchData();
 
+            /** DEBUG */
             {
                 const CPURegisters regs = cpu_ctx.regs;
-                LOG( LOG_INFO, "%04X: %-7s (%02X %02X %02X) A: %02X B: %02X C: %02X", regs.pc,
-                     GetInstructionName( cpu_ctx.inst_state.cur_inst->type ), cpu_ctx.inst_state.cur_opcode,
-                     ReadBus( regs.pc + 1 ), ReadBus( regs.pc + 2 ), regs.a, regs.b, regs.c );
+
+                LOG( LOG_INFO,
+                     "%08llX PC:%04X | %-12s %02X %02X %02X | A:%02X F:%c%c%c%c | BC:%02X%02X DE:%02X%02X "
+                     "HL:%02X%02X",
+                     GetEmulatorContext()->ticks, regs.pc, GetInstructionName( cpu_ctx.inst_state.cur_inst->type ),
+                     cpu_ctx.inst_state.cur_opcode, ReadBus( regs.pc + 1 ), ReadBus( regs.pc + 2 ), regs.a,
+                     FLAG_CHAR( Z ), FLAG_CHAR( N ), FLAG_CHAR( H ), FLAG_CHAR( C ), regs.b, regs.c, regs.d, regs.e,
+                     regs.h, regs.l );
             }
 
             if( NULL == cpu_ctx.inst_state.cur_inst )

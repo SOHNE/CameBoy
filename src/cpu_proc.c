@@ -38,9 +38,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Module Defines and Macros
 //----------------------------------------------------------------------------------------------------------------------
-// Flag access functions that use your existing bit operations
+// Flag access
 #define GET_FLAG( flag )        BIT_CHECK( cpu_ctx->regs.f, FLAG_##flag##_BIT )
 #define SET_FLAG( flag, value ) BIT_ASSIGN( cpu_ctx->regs.f, FLAG_##flag##_BIT, value )
+
+//----------------------------------------------------------------------------------------------------------------------
+// Module Functions Declarations
+//----------------------------------------------------------------------------------------------------------------------
+CPUInstructionProc GetInstructionProcessor( InsType type );
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Definitions
@@ -59,6 +64,7 @@ CheckCond( CPUContext * cpu_ctx )
             case CT_NC:   return !c;
             case CT_Z:    return z;
             case CT_NZ:   return !z;
+            default:      return false;
         }
     return false;
 }
@@ -163,7 +169,7 @@ ProcJP( CPUContext * cpu_ctx )
 // Global Variables Definition
 //----------------------------------------------------------------------------------------------------------------------
 // Define the processors array and populate it with instruction processor functions.
-#define PROC( name ) [INS_##name] = Proc##name
+#define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
 
 static CPUInstructionProc PROCESSORS[] = {
     PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( XOR ),

@@ -324,7 +324,7 @@ typedef enum
     INS_RST,  /**< Restart; similar to a subroutine call to a fixed memory address */
     INS_ERR,  /**< Error or undefined instruction */
 
-    // CB instructions (extended opcodes following the IN_CB prefix)
+    // CB instructions
     INS_RLC,  /**< Rotate left circular (operates on bits) */
     INS_RRC,  /**< Rotate right circular (operates on bits) */
     INS_RL,   /**< Rotate left through the carry flag */
@@ -478,6 +478,8 @@ CCAPI bool StepEmulator( void );
 CCAPI void AddEmulatorCycles( u32 cpu_cycles );
 
 CCAPI bool IsEmulatorRunning( void );
+
+CCAPI EmuContext * GetEmulatorContext( void );
 
 // Bus
 //------------------------------------------------------------------

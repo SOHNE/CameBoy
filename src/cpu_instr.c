@@ -33,9 +33,17 @@
 #include "camecore/camecore.h"
 
 //----------------------------------------------------------------------------------------------------------------------
+// Module Functions Declarations
+//----------------------------------------------------------------------------------------------------------------------
+Instruction * GetInstructionByOpCode( u8 opcode );
+char *        GetInstructionName( InsType t );
+
+//----------------------------------------------------------------------------------------------------------------------
 // Variables Definition
 //----------------------------------------------------------------------------------------------------------------------
-static Instruction instructions[0x100] = {
+// Initialize the instructions table indexed by opcode (0x00 to 0xFF)
+static const Instruction instructions[0x100] = {
+    /**           MNE,      AM,    1REG,    2REG,    COND,  ARGS */
     [0x00] = {INS_NOP,  AM_IMP, RT_NONE, RT_NONE, CT_NONE, 0x00},
 
     [0x05] = {INS_DEC,    AM_R,    RT_B, RT_NONE, CT_NONE, 0x00},
@@ -49,12 +57,13 @@ static Instruction instructions[0x100] = {
     [0xF3] = { INS_DI,  AM_IMP, RT_NONE, RT_NONE, CT_NONE, 0x00}
 };
 
-static char * inst_lookup[] = {
+static const char * inst_lookup[] = {
     "<NONE>", "NOP",     "LD",      "INC",      "DEC",     "RLCA",    "ADD",     "RRCA",    "STOP",    "RLA",
     "JR",     "RRA",     "DAA",     "CPL",      "SCF",     "CCF",     "HALT",    "ADC",     "SUB",     "SBC",
     "AND",    "XOR",     "OR",      "CP",       "POP",     "JP",      "PUSH",    "RET",     "CB",      "CALL",
     "RETI",   "LDH",     "JPHL",    "DI",       "EI",      "RST",     "INS_ERR", "INS_RLC", "INS_RRC", "INS_RL",
-    "INS_RR", "INS_SLA", "INS_SRA", "INS_SWAP", "INS_SRL", "INS_BIT", "INS_RES", "INS_SET" };
+    "INS_RR", "INS_SLA", "INS_SRA", "INS_SWAP", "INS_SRL", "INS_BIT", "INS_RES", "INS_SET",
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definitions
