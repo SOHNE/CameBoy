@@ -128,54 +128,22 @@ WriteBus( u16 addr, u8 value )
             WriteCartridge( addr, value );
             return;
         }
-    else if( addr <= VRAM_END )
-        {
-            // Video RAM (VRAM): 0x8000–0x9FFF
-            NO_IMPL();
-        }
-    else if( addr <= EXTRAM_END )
-        {
-            // Cartridge RAM (External RAM): 0xA000–0xBFFF
-            NO_IMPL();
-        }
-    else if( addr <= WRAM_END )
-        {
-            // Work RAM (WRAM): 0xC000–0xDFFF
-            NO_IMPL();
-        }
-    else if( addr <= ECHO_END )
-        {
-            // Echo RAM (mirrors WRAM): 0xE000–0xFDFF
-            NO_IMPL();
-        }
-    else if( addr <= OAM_END )
-        {
-            // Object Attribute Memory (OAM): 0xFE00–0xFE9F
-            NO_IMPL();
-        }
-    else if( addr <= 0xFEFF )
-        {
-            // Unusable/Reserved memory: 0xFEA0–0xFEFF
-            NO_IMPL();
-        }
-    else if( addr <= IO_END )
-        {
-            // I/O Registers: 0xFF00–0xFF7F
-            NO_IMPL();
-        }
-    else if( addr <= HRAM_END )
-        {
-            // High RAM (HRAM): 0xFF80–0xFFFE
-            NO_IMPL();
-        }
-    else if( addr == IE_REGISTER )
-        {
-            // Interrupt Enable Register: 0xFFFF
-            NO_IMPL();
-        }
-    else
-        {
-            // High RAM (HRAM): 0xFF80–0xFFFE
-            NO_IMPL();
-        }
+
+    LOG( LOG_ERROR, "UNSUPPORTED BusWrite %04X", addr );
+}
+
+u16
+ReadBus16( u16 address )
+{
+    u16 lo = ReadBus( address );
+    u16 hi = ReadBus( address + 1 );
+
+    return (u16)( lo | ( hi << 8 ) );
+}
+
+void
+WriteBus16( u16 address, u16 value )
+{
+    WriteBus( address + 1, HIGH_BYTE( value ) );
+    WriteBus( address, LOW_BYTE( value ) );
 }

@@ -488,6 +488,9 @@ CCAPI EmuContext * GetEmulatorContext( void );
 CCAPI u8   ReadBus( u16 addr );
 CCAPI void WriteBus( u16 addr, u8 value );
 
+CCAPI void WriteBus16( u16 address, u16 value );
+CCAPI u16  ReadBus16( u16 address );
+
 // Cart
 //------------------------------------------------------------------
 CCAPI bool LoadCartridge( char * cart );
