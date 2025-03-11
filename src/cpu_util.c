@@ -30,11 +30,13 @@
  *************************************************************************/
 
 #include "camecore/camecore.h"
+#include "camecore/utils.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Defines and Macros
 //----------------------------------------------------------------------------------------------------------------------
-#define REVERSE( n ) ( (u16)( ( ( (u16)( n ) & 0xFF00 ) >> 8 ) | ( ( (u16)( n ) & 0x00FF ) << 8 ) ) )
+#define REVERSE( n )      ( (u16)( ( LOW_BYTE( n ) << 8 ) | HIGH_BYTE( n ) ) ) /**< Swap high/low bytes of a 16-bit */
+#define PTR_TO_U16( ptr ) *( (u16 *)&( ptr ) ) /**< Cast address to u16 pointer and dereference */
 
 //----------------------------------------------------------------------------------------------------------------------
 // Global Variables Definition
@@ -44,7 +46,8 @@ extern CPUContext cpu_ctx;
 //----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Declarations
 //----------------------------------------------------------------------------------------------------------------------
-u16 GetRegister( RegType rt );
+u16  GetRegister( RegType rt );
+void SetRegister( RegType rt, u16 val );
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definitions
@@ -64,14 +67,40 @@ GetRegister( RegType rt )
             case RT_H:    return cpu_ctx.regs.h;
             case RT_L:    return cpu_ctx.regs.l;
 
-            case RT_AF:   return REVERSE( *( (u16 *)&cpu_ctx.regs.a ) );
-            case RT_BC:   return REVERSE( *( (u16 *)&cpu_ctx.regs.b ) );
-            case RT_DE:   return REVERSE( *( (u16 *)&cpu_ctx.regs.d ) );
-            case RT_HL:   return REVERSE( *( (u16 *)&cpu_ctx.regs.h ) );
+            case RT_AF:   return REVERSE( PTR_TO_U16( cpu_ctx.regs.a ) );
+            case RT_BC:   return REVERSE( PTR_TO_U16( cpu_ctx.regs.b ) );
+            case RT_DE:   return REVERSE( PTR_TO_U16( cpu_ctx.regs.d ) );
+            case RT_HL:   return REVERSE( PTR_TO_U16( cpu_ctx.regs.h ) );
 
             case RT_PC:   return cpu_ctx.regs.pc;
             case RT_SP:   return cpu_ctx.regs.sp;
 
-            default:      return 0;
+            case RT_NONE: return 0;
+        }
+}
+
+void
+SetRegister( RegType rt, u16 val )
+{
+    switch( rt )
+        {
+            case RT_A:    cpu_ctx.regs.a = LOW_BYTE( val ); break;
+            case RT_F:    cpu_ctx.regs.f = LOW_BYTE( val ); break;
+            case RT_B:    cpu_ctx.regs.b = LOW_BYTE( val ); break;
+            case RT_C:    cpu_ctx.regs.c = LOW_BYTE( val ); break;
+            case RT_D:    cpu_ctx.regs.d = LOW_BYTE( val ); break;
+            case RT_E:    cpu_ctx.regs.e = LOW_BYTE( val ); break;
+            case RT_H:    cpu_ctx.regs.h = LOW_BYTE( val ); break;
+            case RT_L:    cpu_ctx.regs.l = LOW_BYTE( val ); break;
+
+            case RT_AF:   PTR_TO_U16( cpu_ctx.regs.a ) = REVERSE( val ); break;
+            case RT_BC:   PTR_TO_U16( cpu_ctx.regs.b ) = REVERSE( val ); break;
+            case RT_DE:   PTR_TO_U16( cpu_ctx.regs.d ) = REVERSE( val ); break;
+            case RT_HL:   PTR_TO_U16( cpu_ctx.regs.h ) = REVERSE( val ); break;
+
+            case RT_PC:   cpu_ctx.regs.pc = val; break;
+            case RT_SP:   cpu_ctx.regs.sp = val; break;
+
+            case RT_NONE: break;
         }
 }
