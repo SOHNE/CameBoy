@@ -47,12 +47,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 CPUInstructionProc GetInstructionProcessor( InsType type );
 
+extern u16  GetRegister( RegType rt );
+extern void SetRegister( RegType rt, u16 val );
+
 //----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Definitions
 //----------------------------------------------------------------------------------------------------------------------
 // Return the check condition based on the given current instruction condition type
 static bool
-CheckCond( CPUContext * cpu_ctx )
+CheckCondition( CPUContext * cpu_ctx )
 {
     const bool z = GET_FLAG( Z );
     const bool c = GET_FLAG( C );
@@ -69,13 +72,14 @@ CheckCond( CPUContext * cpu_ctx )
     return false;
 }
 
-// Instructions Definition
+// Instructions Implementation
 //------------------------------------------------------------------
+
 /**
  * Invalid Instruction Handler
  *
  * Logs a fatal error when an invalid/unimplemented opcode is encountered.
- * Does not modify any CPU state or flags.
+ * Exits the program with error code -7.
  *
  * Z N H C
  * - - - -
@@ -84,13 +88,13 @@ static void
 ProcNONE( CPUContext * cpu_ctx )
 {
     UNUSED( cpu_ctx );
-    LOG( LOG_FATAL, "INVALID INSTRUCTION" );
+    LOG( LOG_FATAL, "INVALID INSTRUCTION!\n" );
 }
 
-/*
+/**
  * Mnemonic    : NOP
- * Instruction : Only advances the program counter by 1.
- * Function    :
+ * Instruction : No Operation
+ * Function    : Does nothing
  *
  * Z N H C
  * - - - -
@@ -101,10 +105,10 @@ ProcNOP( CPUContext * cpu_ctx )
     UNUSED( cpu_ctx );
 }
 
-/*
+/**
  * Mnemonic    : DI
- * Instruction : Reset the interrupt master enable (IME) flag
- * Function    : IME = 0
+ * Instruction : Disable Interrupts
+ * Function    : Disables interrupt master enable flag
  *
  * Z N H C
  * - - - -
@@ -115,24 +119,68 @@ ProcDI( CPUContext * cpu_ctx )
     cpu_ctx->interupt_state.ime = false;
 }
 
-/*
+/**
  * Mnemonic    : LD
  * Instruction : Load
- * Function    : R = O
+ * Function    : Loads data into register or memory
  *
  * Z N H C
  * - - - -
+ * (flags affected for specific LD operations)
  */
+// TODO: Fix the conversion loses at SetRegister
 static void
 ProcLD( CPUContext * cpu_ctx )
 {
-    UNUSED( cpu_ctx );
+    // If destination is memory, perform a memory write
+    if( true == cpu_ctx->inst_state.dest_is_mem )
+        {
+            // LD (destination), source
+            if( RT_AF <= cpu_ctx->inst_state.cur_inst->secondary_reg )
+                {
+                    // 16-bit register: add a cycle and write 16 bits
+                    AddEmulatorCycles( 1 );
+                    WriteBus16( cpu_ctx->inst_state.mem_dest, cpu_ctx->inst_state.fetched_data );
+                }
+            else
+                {
+                    // 8-bit register: write only the lower byte
+                    WriteBus( cpu_ctx->inst_state.mem_dest, LOW_BYTE( cpu_ctx->inst_state.fetched_data ) );
+                }
+            return;
+        }
+
+    // Handle special case: HL = SP + r8 addressing mode
+    if( AM_HL_SPR == cpu_ctx->inst_state.cur_inst->addr_mode )
+        {
+            // Compute half-carry flag: if lower nibble sum is at least 0x10
+            u8 hflag = ( 0x10 <= ( ( ( GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) & 0xF ) +
+                                     ( cpu_ctx->inst_state.fetched_data & 0xF ) ) ) );
+
+            // Compute carry flag: if full byte sum is at least 0x100
+            u8 cflag = ( 0x100 <= ( ( ( GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) & 0xFF ) +
+                                      ( cpu_ctx->inst_state.fetched_data & 0xFF ) ) ) );
+
+            // Set flags
+            SET_FLAG( Z, 0 );
+            SET_FLAG( N, 0 );
+            SET_FLAG( H, hflag );
+            SET_FLAG( C, cflag );
+
+            SetRegister( cpu_ctx->inst_state.cur_inst->primary_reg,
+                         GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) +
+                             (char)cpu_ctx->inst_state.fetched_data );
+            return;
+        }
+
+    // Standard register load: simply move the fetched data to the target register
+    SetRegister( cpu_ctx->inst_state.cur_inst->primary_reg, cpu_ctx->inst_state.fetched_data );
 }
 
-/*
+/**
  * Mnemonic    : XOR
- * Instruction : Logical Exclusive OR
- * Function    : A = A ^ OP
+ * Instruction : Logical XOR
+ * Function    : A = A ^ operand
  *
  * Z N H C
  * + 0 0 0
@@ -148,10 +196,10 @@ ProcXOR( CPUContext * cpu_ctx )
     SET_FLAG( C, 0 );
 }
 
-/*
+/**
  * Mnemonic    : JP
- * Instruction : Jump To Location
- * Function    : pc = address
+ * Instruction : Jump
+ * Function    : PC = address if condition is met
  *
  * Z N H C
  * - - - -
@@ -159,16 +207,16 @@ ProcXOR( CPUContext * cpu_ctx )
 static void
 ProcJP( CPUContext * cpu_ctx )
 {
-    if( false == CheckCond( cpu_ctx ) ) return;
-
-    cpu_ctx->regs.pc = cpu_ctx->inst_state.fetched_data;
-    AddEmulatorCycles( 1 );
+    if( CheckCondition( cpu_ctx ) )
+        {
+            cpu_ctx->regs.pc = cpu_ctx->inst_state.fetched_data;
+            AddEmulatorCycles( 1 );
+        }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Global Variables Definition
+// Processor Table
 //----------------------------------------------------------------------------------------------------------------------
-// Define the processors array and populate it with instruction processor functions.
 static CPUInstructionProc PROCESSORS[] = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
@@ -180,7 +228,7 @@ static CPUInstructionProc PROCESSORS[] = {
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definitions
 //----------------------------------------------------------------------------------------------------------------------
-// Retrieve the given instruction execution method
+
 CPUInstructionProc
 GetInstructionProcessor( InsType type )
 {
