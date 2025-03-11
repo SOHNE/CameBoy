@@ -169,13 +169,13 @@ ProcJP( CPUContext * cpu_ctx )
 // Global Variables Definition
 //----------------------------------------------------------------------------------------------------------------------
 // Define the processors array and populate it with instruction processor functions.
-#define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-
 static CPUInstructionProc PROCESSORS[] = {
-    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( XOR ),
-};
 
+#define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
+    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( XOR ),
 #undef PROC
+
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definitions
