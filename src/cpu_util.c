@@ -58,24 +58,24 @@ GetRegister( RegType rt )
 {
     switch( rt )
         {
-            case RT_A:    return cpu_ctx.regs.a;
-            case RT_F:    return cpu_ctx.regs.f;
-            case RT_B:    return cpu_ctx.regs.b;
-            case RT_C:    return cpu_ctx.regs.c;
-            case RT_D:    return cpu_ctx.regs.d;
-            case RT_E:    return cpu_ctx.regs.e;
-            case RT_H:    return cpu_ctx.regs.h;
-            case RT_L:    return cpu_ctx.regs.l;
+            case RT_A:  return cpu_ctx.regs.a;
+            case RT_F:  return cpu_ctx.regs.f;
+            case RT_B:  return cpu_ctx.regs.b;
+            case RT_C:  return cpu_ctx.regs.c;
+            case RT_D:  return cpu_ctx.regs.d;
+            case RT_E:  return cpu_ctx.regs.e;
+            case RT_H:  return cpu_ctx.regs.h;
+            case RT_L:  return cpu_ctx.regs.l;
 
-            case RT_AF:   return REVERSE( PTR_TO_U16( cpu_ctx.regs.a ) );
-            case RT_BC:   return REVERSE( PTR_TO_U16( cpu_ctx.regs.b ) );
-            case RT_DE:   return REVERSE( PTR_TO_U16( cpu_ctx.regs.d ) );
-            case RT_HL:   return REVERSE( PTR_TO_U16( cpu_ctx.regs.h ) );
+            case RT_AF: return REVERSE( PTR_TO_U16( cpu_ctx.regs.a ) );
+            case RT_BC: return REVERSE( PTR_TO_U16( cpu_ctx.regs.b ) );
+            case RT_DE: return REVERSE( PTR_TO_U16( cpu_ctx.regs.d ) );
+            case RT_HL: return REVERSE( PTR_TO_U16( cpu_ctx.regs.h ) );
 
-            case RT_PC:   return cpu_ctx.regs.pc;
-            case RT_SP:   return cpu_ctx.regs.sp;
+            case RT_PC: return cpu_ctx.regs.pc;
+            case RT_SP: return cpu_ctx.regs.sp;
 
-            case RT_NONE: return 0;
+            default:    return 0;
         }
 }
 
