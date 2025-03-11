@@ -109,7 +109,7 @@ CPUStep( void )
                 const CPURegisters regs = cpu_ctx.regs;
 
                 LOG( LOG_INFO,
-                     "%08llX PC:%04X | %-12s %02X %02X %02X | A:%02X F:%c%c%c%c | BC:%02X%02X DE:%02X%02X "
+                     "%08llX PC:%04X | %-12s | %02X %02X %02X | A:%02X F:%c%c%c%c | BC:%02X%02X DE:%02X%02X "
                      "HL:%02X%02X",
                      GetEmulatorContext()->ticks, regs.pc, GetInstructionName( cpu_ctx.inst_state.cur_inst->type ),
                      cpu_ctx.inst_state.cur_opcode, ReadBus( regs.pc + 1 ), ReadBus( regs.pc + 2 ), regs.a,
