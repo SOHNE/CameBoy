@@ -41,6 +41,11 @@
 extern CPUContext cpu_ctx;
 
 //----------------------------------------------------------------------------------------------------------------------
+// Address Mode Handler Function Declarations
+//----------------------------------------------------------------------------------------------------------------------
+typedef void ( *AddressModeHandler )( void );
+
+//----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Declarations
 //----------------------------------------------------------------------------------------------------------------------
 // CPU Fetch
@@ -73,6 +78,236 @@ FETCH_LO_HI( u16 pc )
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Module Internal Functions Definitions
+//----------------------------------------------------------------------------------------------------------------------
+// Implied addressing: no operand
+static void
+AM_Handler_IMP( void )
+{
+    return;
+}
+
+// Register addressing: data in register
+static void
+AM_Handler_R( void )
+{
+    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
+}
+
+// Register to register addressing
+static void
+AM_Handler_R_R( void )
+{
+    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
+}
+
+// Register + 8-bit immediate
+static void
+AM_Handler_R_D8( void )
+{
+    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
+    AddEmulatorCycles( 1 );
+    ++cpu_ctx.regs.pc;
+}
+
+// Register + 16-bit immediate
+static void
+AM_Handler_R_D16( void )
+{
+    cpu_ctx.inst_state.fetched_data  = FETCH_LO_HI( cpu_ctx.regs.pc );
+    cpu_ctx.regs.pc                 += 2;
+}
+
+// 16-bit immediate address
+static void
+AM_Handler_D16( void )
+{
+    cpu_ctx.inst_state.fetched_data  = FETCH_LO_HI( cpu_ctx.regs.pc );
+    cpu_ctx.regs.pc                 += 2;
+}
+
+// Memory address in register + register data
+static void
+AM_Handler_MR_R( void )
+{
+    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
+    cpu_ctx.inst_state.mem_dest     = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
+    cpu_ctx.inst_state.dest_is_mem  = true;
+
+    if( RT_C == cpu_ctx.inst_state.cur_inst->primary_reg )
+        {
+            cpu_ctx.inst_state.mem_dest |= 0xFF00;
+        }
+}
+
+// Register + memory address in register
+static void
+AM_Handler_R_MR( void )
+{
+    u16 addr = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
+
+    if( RT_C == cpu_ctx.inst_state.cur_inst->secondary_reg )
+        {
+            addr |= 0xFF00;
+        }
+
+    cpu_ctx.inst_state.fetched_data = ReadBus( addr );
+    AddEmulatorCycles( 1 );
+}
+
+// Register + (HL), increment HL
+static void
+AM_Handler_R_HLI( void )
+{
+    cpu_ctx.inst_state.fetched_data = ReadBus( GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg ) );
+    AddEmulatorCycles( 1 );
+    SetRegister( RT_HL, GetRegister( RT_HL ) + 1 );
+}
+
+// Register + (HL), decrement HL
+static void
+AM_Handler_R_HLD( void )
+{
+    cpu_ctx.inst_state.fetched_data = ReadBus( GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg ) );
+    AddEmulatorCycles( 1 );
+    SetRegister( RT_HL, GetRegister( RT_HL ) - 1 );
+}
+
+// (HL) + register, increment HL
+static void
+AM_Handler_HLI_R( void )
+{
+    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
+    cpu_ctx.inst_state.mem_dest     = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
+    cpu_ctx.inst_state.dest_is_mem  = true;
+    SetRegister( RT_HL, GetRegister( RT_HL ) + 1 );
+}
+
+// (HL) + register, decrement HL
+static void
+AM_Handler_HLD_R( void )
+{
+    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
+    cpu_ctx.inst_state.mem_dest     = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
+    cpu_ctx.inst_state.dest_is_mem  = true;
+    SetRegister( RT_HL, GetRegister( RT_HL ) - 1 );
+}
+
+// Register + 8-bit address offset
+static void
+AM_Handler_R_A8( void )
+{
+    u16 addr                        = ReadBus( cpu_ctx.regs.pc ) | 0xFF00;
+    cpu_ctx.inst_state.fetched_data = ReadBus( addr );
+    AddEmulatorCycles( 1 );
+    ++cpu_ctx.regs.pc;
+}
+
+// 8-bit address offset + register
+static void
+AM_Handler_A8_R( void )
+{
+    cpu_ctx.inst_state.mem_dest     = ReadBus( cpu_ctx.regs.pc ) | 0xFF00;
+    cpu_ctx.inst_state.dest_is_mem  = true;
+    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
+    AddEmulatorCycles( 1 );
+    ++cpu_ctx.regs.pc;
+}
+
+// HL + SP + register
+static void
+AM_Handler_HL_SPR( void )
+{
+    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
+    AddEmulatorCycles( 1 );
+    ++cpu_ctx.regs.pc;
+}
+
+static void
+AM_Handler_D8( void )
+{
+    // 8-bit immediate data
+    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
+    AddEmulatorCycles( 1 );
+    ++cpu_ctx.regs.pc;
+}
+
+// 16-bit address + register
+static void
+AM_Handler_A16_R( void )
+{
+    u16 addr                         = FETCH_LO_HI( cpu_ctx.regs.pc );
+    cpu_ctx.regs.pc                 += 2;
+
+    cpu_ctx.inst_state.mem_dest      = addr;
+    cpu_ctx.inst_state.dest_is_mem   = true;
+
+    cpu_ctx.inst_state.fetched_data  = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
+}
+
+// Same implementation as A16_R
+static void
+AM_Handler_D16_R( void )
+{
+    AM_Handler_A16_R();
+}
+
+// Memory address in register + 8-bit immediate
+static void
+AM_Handler_MR_D8( void )
+{
+    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
+    AddEmulatorCycles( 1 );
+    ++cpu_ctx.regs.pc;
+    cpu_ctx.inst_state.mem_dest    = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
+    cpu_ctx.inst_state.dest_is_mem = true;
+}
+
+// Memory address in register
+static void
+AM_Handler_MR( void )
+{
+    cpu_ctx.inst_state.mem_dest     = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
+    cpu_ctx.inst_state.dest_is_mem  = true;
+    cpu_ctx.inst_state.fetched_data = ReadBus( GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg ) );
+    AddEmulatorCycles( 1 );
+}
+
+// Register + 16-bit address
+static void
+AM_Handler_R_A16( void )
+{
+    u16 addr                         = FETCH_LO_HI( cpu_ctx.regs.pc );
+    cpu_ctx.regs.pc                 += 2;
+
+    cpu_ctx.inst_state.fetched_data  = ReadBus( addr );
+    AddEmulatorCycles( 1 );
+}
+
+// Unknown addressing mode handler
+static void
+AM_Handler_UNKNOWN( void )
+{
+    LOG( LOG_FATAL, "Unknown Addressing Mode! %d (%02X)\n", cpu_ctx.inst_state.cur_inst->addr_mode,
+         cpu_ctx.inst_state.cur_opcode );
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Address Mode Handler Table
+//----------------------------------------------------------------------------------------------------------------------
+static AddressModeHandler ADDRESS_MODE_HANDLERS[] = {
+
+#define AM_HANDLER( mode ) [AM_##mode] = AM_Handler_##mode
+    AM_HANDLER( IMP ),   AM_HANDLER( R ),     AM_HANDLER( R_R ),   AM_HANDLER( R_D8 ),  AM_HANDLER( R_D16 ),
+    AM_HANDLER( D16 ),   AM_HANDLER( MR_R ),  AM_HANDLER( R_MR ),  AM_HANDLER( R_HLI ), AM_HANDLER( R_HLD ),
+    AM_HANDLER( HLI_R ), AM_HANDLER( HLD_R ), AM_HANDLER( R_A8 ),  AM_HANDLER( A8_R ),  AM_HANDLER( HL_SPR ),
+    AM_HANDLER( D8 ),    AM_HANDLER( A16_R ), AM_HANDLER( D16_R ), AM_HANDLER( MR_D8 ), AM_HANDLER( MR ),
+    AM_HANDLER( R_A16 )
+#undef AM_HANDLER
+
+};
+
+//----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definitions
 //----------------------------------------------------------------------------------------------------------------------
 // Retrieve the next instruction opcode and `Instruction`
@@ -85,7 +320,6 @@ FetchInstruction( void )
 
 // Retrieve the current instruction data
 // TODO: Review the AM executions
-// TODO: Create a lookup table
 void
 FetchData( void )
 {
@@ -94,191 +328,16 @@ FetchData( void )
 
     if( NULL == cpu_ctx.inst_state.cur_inst ) return;
 
-    switch( cpu_ctx.inst_state.cur_inst->addr_mode )
+    // Get addressing mode from current instruction
+    AddrMode mode = cpu_ctx.inst_state.cur_inst->addr_mode;
+
+    // Check if mode is valid
+    if( false == INDEX_VALID( mode, ADDRESS_MODE_HANDLERS ) )
         {
-            case AM_IMP: /** Implied addressing: no operand */ return;
-
-            case AM_R:
-                /** Register addressing: data in register */
-                {
-                    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
-                    return;
-                }
-            case AM_R_R:
-                /** Register to register addressing */
-                {
-                    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
-                    return;
-                }
-            case AM_R_D8:
-                /** Register + 8-bit immediate */
-                {
-                    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
-                    AddEmulatorCycles( 1 );
-                    ++cpu_ctx.regs.pc;
-                    return;
-                }
-            case AM_R_D16:
-                /** Register + 16-bit immediate */
-                {
-                    cpu_ctx.inst_state.fetched_data  = FETCH_LO_HI( cpu_ctx.regs.pc );
-                    cpu_ctx.regs.pc                 += 2;
-                    return;
-                }
-            case AM_D16:
-                /** 16-bit immediate address */
-                {
-                    cpu_ctx.inst_state.fetched_data  = FETCH_LO_HI( cpu_ctx.regs.pc );
-                    cpu_ctx.regs.pc                 += 2;
-                    return;
-                }
-            case AM_MR_R:
-                /** Memory address in register + register data */
-                {
-                    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
-                    cpu_ctx.inst_state.mem_dest     = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
-                    cpu_ctx.inst_state.dest_is_mem  = true;
-
-                    if( RT_C == cpu_ctx.inst_state.cur_inst->primary_reg )
-                        {
-                            cpu_ctx.inst_state.mem_dest |= 0xFF00;
-                        }
-                    return;
-                }
-            case AM_R_MR:
-                /** Register + memory address in register */
-                {
-                    u16 addr = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
-
-                    if( RT_C == cpu_ctx.inst_state.cur_inst->secondary_reg )
-                        {
-                            addr |= 0xFF00;
-                        }
-
-                    cpu_ctx.inst_state.fetched_data = ReadBus( addr );
-                    AddEmulatorCycles( 1 );
-                    return;
-                }
-            case AM_R_HLI:
-                /** Register + (HL), increment HL */
-                {
-                    cpu_ctx.inst_state.fetched_data =
-                        ReadBus( GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg ) );
-                    AddEmulatorCycles( 1 );
-                    SetRegister( RT_HL, GetRegister( RT_HL ) + 1 );
-                    return;
-                }
-            case AM_R_HLD:
-                /** Register + (HL), decrement HL */
-                {
-                    cpu_ctx.inst_state.fetched_data =
-                        ReadBus( GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg ) );
-                    AddEmulatorCycles( 1 );
-                    SetRegister( RT_HL, GetRegister( RT_HL ) - 1 );
-                    return;
-                }
-            case AM_HLI_R:
-                /** (HL) + register, increment HL */
-                {
-                    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
-                    cpu_ctx.inst_state.mem_dest     = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
-                    cpu_ctx.inst_state.dest_is_mem  = true;
-                    SetRegister( RT_HL, GetRegister( RT_HL ) + 1 );
-                    return;
-                }
-            case AM_HLD_R:
-                /** (HL) + register, decrement HL */
-                {
-                    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
-                    cpu_ctx.inst_state.mem_dest     = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
-                    cpu_ctx.inst_state.dest_is_mem  = true;
-                    SetRegister( RT_HL, GetRegister( RT_HL ) - 1 );
-                    return;
-                }
-            case AM_R_A8:
-                /** Register + 8-bit address offset */
-                {
-                    u16 addr                        = ReadBus( cpu_ctx.regs.pc ) | 0xFF00;
-                    cpu_ctx.inst_state.fetched_data = ReadBus( addr );
-                    AddEmulatorCycles( 1 );
-                    ++cpu_ctx.regs.pc;
-                    return;
-                }
-            case AM_A8_R:
-                /** 8-bit address offset + register */
-                {
-                    cpu_ctx.inst_state.mem_dest     = ReadBus( cpu_ctx.regs.pc ) | 0xFF00;
-                    cpu_ctx.inst_state.dest_is_mem  = true;
-                    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
-                    AddEmulatorCycles( 1 );
-                    ++cpu_ctx.regs.pc;
-                    return;
-                }
-            case AM_HL_SPR:
-                /** HL + SP + register */
-                {
-                    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
-                    AddEmulatorCycles( 1 );
-                    ++cpu_ctx.regs.pc;
-                    return;
-                }
-            case AM_D8:
-                /** 8-bit immediate data */
-                {
-                    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
-                    AddEmulatorCycles( 1 );
-                    ++cpu_ctx.regs.pc;
-                    return;
-                }
-            case AM_A16_R:
-            case AM_D16_R:
-                /** 16-bit address + register */
-                {
-                    u16 addr                         = FETCH_LO_HI( cpu_ctx.regs.pc );
-                    cpu_ctx.regs.pc                 += 2;
-
-                    cpu_ctx.inst_state.mem_dest      = addr;
-                    cpu_ctx.inst_state.dest_is_mem   = true;
-
-                    cpu_ctx.inst_state.fetched_data  = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
-                    return;
-                }
-            case AM_MR_D8:
-                /** Memory address in register + 8-bit immediate */
-                {
-                    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
-                    AddEmulatorCycles( 1 );
-                    ++cpu_ctx.regs.pc;
-                    cpu_ctx.inst_state.mem_dest    = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
-                    cpu_ctx.inst_state.dest_is_mem = true;
-                    return;
-                }
-            case AM_MR:
-                /** Memory address in register */
-                {
-                    cpu_ctx.inst_state.mem_dest    = GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg );
-                    cpu_ctx.inst_state.dest_is_mem = true;
-                    cpu_ctx.inst_state.fetched_data =
-                        ReadBus( GetRegister( cpu_ctx.inst_state.cur_inst->primary_reg ) );
-                    AddEmulatorCycles( 1 );
-                    return;
-                }
-            case AM_R_A16:
-                /** Register + 16-bit address */
-                {
-                    u16 addr                         = FETCH_LO_HI( cpu_ctx.regs.pc );
-                    cpu_ctx.regs.pc                 += 2;
-
-                    cpu_ctx.inst_state.fetched_data  = ReadBus( addr );
-                    AddEmulatorCycles( 1 );
-                    return;
-                }
-            default:
-                /** Unknown addressing mode handler */
-                {
-                    LOG( LOG_FATAL, "Unknown Addressing Mode! %d (%02X)\n", cpu_ctx.inst_state.cur_inst->addr_mode,
-                         cpu_ctx.inst_state.cur_opcode );
-                    return;
-                }
+            AM_Handler_UNKNOWN();
+            return;
         }
+
+    // Call the appropriate handler function from the lookup table
+    ADDRESS_MODE_HANDLERS[mode]();
 }
