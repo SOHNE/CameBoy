@@ -83,25 +83,39 @@ if(NOT DEFINED EMSCRIPTEN)
 
 endif()
 
+CPMAddPackage(
+  NAME argparse
+  GITHUB_REPOSITORY cofyc/argparse
+  GIT_TAG v1.1.0
+  OPTIONS
+    "ARGPARSE_SHARED OFF"
+)
+
 # --------------------------------------------------------------------
 # Testbed Setup
 # --------------------------------------------------------------------
 set(STANDALONE_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/emulator.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/sdl_window.c
 )
 
 set(STANDALONE_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/emulator.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sdl_window.h
 )
 
 add_executable(${PROJECT_NAME} ${STANDALONE_SOURCE_FILES} ${STANDALONE_HEADER_FILES})
 target_include_directories(${PROJECT_NAME}
     PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
+      ${argparse_SOURCE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
       CameCore::CameCore
+      argparse
       # SDL2
       $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
       $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>

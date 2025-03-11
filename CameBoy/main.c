@@ -1,84 +1,61 @@
-#include <stdbool.h>
-#include "camecore/camecore.h"
-#include "SDL2/SDL.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "argparse.h"
 
-#define SCREEN_WIDTH  160
-#define SCREEN_HEIGHT 144
-#define SCALE_FACTOR  4
+#include "camecore/camecore.h"
+#include "emulator.h"
+#include "sdl_window.h"
+
+static const char * const Usages[] = {
+    "CameBoy [options]",
+    NULL,
+};
 
 int
 main( int argc, char * argv[] )
 {
-    UNUSED( argc );
-    UNUSED( argv );
+    const char * CartridgePath       = NULL;
+    int          Debug               = 0;
 
-    SDL_Window *   window   = NULL;
-    SDL_Renderer * renderer = NULL;
+    struct argparse_option Options[] = {
+        OPT_HELP(),
+        OPT_BOOLEAN( 'd', "debug", &Debug, "Enable debug logging", NULL, 0, 0 ),
+        OPT_STRING( 'c', "cartridge", &CartridgePath, "Path to the cartridge file", NULL, 0, 0 ),
+        OPT_END(),
+    };
 
-    // Initialize SDL
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+    struct argparse ArgParse;
+    argparse_init( &ArgParse, Options, Usages, 0 );
+    argparse_describe( &ArgParse, "\nA Game Boy™ emulator using CameCore and SDL2.",
+                       "\nExample: emulator --debug --cartridge /path/to/legal_rom.gb" );
+    argc = argparse_parse( &ArgParse, argc, (const char **)argv );
+
+    // Set debug
+    SetLogLevel( ( Debug ) ? LOG_DEBUG : LOG_INFO );
+
+    if( !CartridgePath )
         {
-            SDL_Log( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
-            return 1;
+            fprintf( stderr,
+                     "Error: No cartridge file specified. Use -c or --cartridge to specify the cartridge file.\n" );
+            return EXIT_FAILURE;
         }
 
-    // Create window
-    window = SDL_CreateWindow( "gbCEmu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH * SCALE_FACTOR,
-                               SCREEN_HEIGHT * SCALE_FACTOR, SDL_WINDOW_SHOWN );
+    // Setup the emulator
+    InitEmulator();
+    LoadCartridge( (char *)CartridgePath );
 
-    if( window == NULL )
+    // Initialize window
+    if( !InitSDLWindow( "CameBoy Emulator", 480, 432 ) )
         {
-            SDL_Log( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
-            return 1;
+            fprintf( stderr, "Failed to initialize SDL window.\n" );
+            return EXIT_FAILURE;
         }
 
-    // Create renderer
-    renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED );
-    if( renderer == NULL )
-        {
-            SDL_Log( "Renderer could not be created! SDL_Error: %s\n", SDL_GetError() );
-            SDL_DestroyWindow( window );
-            SDL_Quit();
-            return 1;
-        }
+    // Run the emulator main loop
+    RunEmulator();
 
-    // Set render scale
-    SDL_RenderSetScale( renderer, SCALE_FACTOR, SCALE_FACTOR );
+    // Cleanup resources
+    DestroySDLWindow();
 
-    // Main loop flag
-    bool quit = false;
-
-    // Event handler
-    SDL_Event e;
-
-    // Main loop
-    while( !quit )
-        {
-            // Handle events
-            while( SDL_PollEvent( &e ) != 0 )
-                {
-                    if( e.type == SDL_QUIT )
-                        {
-                            quit = true;
-                        }
-                }
-
-            // Clear screen
-            SDL_SetRenderDrawColor( renderer, 155, 188, 15, 255 );
-            SDL_RenderClear( renderer );
-
-            // Draw a sample pixel at (80, 72) - center of screen
-            SDL_SetRenderDrawColor( renderer, 15, 56, 15, 255 );
-            SDL_RenderDrawPoint( renderer, 80, 72 );
-
-            // Update screen
-            SDL_RenderPresent( renderer );
-        }
-
-    // Clean up
-    SDL_DestroyRenderer( renderer );
-    SDL_DestroyWindow( window );
-    SDL_Quit();
-
-    return 0;
+    return EXIT_SUCCESS;
 }
