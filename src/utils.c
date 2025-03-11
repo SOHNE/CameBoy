@@ -88,7 +88,7 @@ TraceLog( i32 logType, const char * text, ... )
     va_start( args, text );
 
     // Use custom callback if available
-    if( traceLog != NULL )
+    if( NULL != traceLog )
         {
             traceLog( logType, text, args );
             va_end( args );
