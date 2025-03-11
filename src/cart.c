@@ -243,18 +243,17 @@ GetCartLicenseeName( void )
 // Get the calculated header check sum
 // NOTE: If the byte at $014D does not match the lower 8 bits of checksum,
 // the boot ROM will lock up and the program in the cartridge won’t run.
-static unsigned char
-GetHeaderChecksum( void * romData )
+static u16
+GetHeaderChecksum(void)
 {
-    unsigned short  checksumCalc = 0;
-    unsigned char * romBytes     = (unsigned char *)romData;
+    u16 checksumCalc = 0;
 
     for( size_t i = HEADER_CHECKSUM_START; i <= HEADER_CHECKSUM_END; ++i )
         {
-            checksumCalc = checksumCalc - romBytes[i] - 1;
+            checksumCalc = checksumCalc - cart_ctx.rom.data[i] - 1;
         }
 
-    return (unsigned char)( checksumCalc & 0xFF );
+    return LOW_BYTE( checksumCalc );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -299,7 +298,7 @@ LoadCartridge( char * cartPath )
     cart_ctx.rom.header->title[sizeof( cart_ctx.rom.header->title ) - 1] = '\0';
 
     // Verify checksum
-    calcChksum = GetHeaderChecksum( cart_ctx.rom.data );
+    calcChksum = GetHeaderChecksum();
     chkValid   = ( calcChksum == cart_ctx.rom.header->checksum );
 
     // Log cart info
