@@ -178,6 +178,37 @@ ProcLD( CPUContext * cpu_ctx )
 }
 
 /**
+ * Mnemonic    : LDH
+ * Instruction : Load High
+ * Function    : Special load instructions for accessing the high memory area (0xFF00-0xFFFF)
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcLDH( CPUContext * ctx )
+{
+    if( RT_A == ctx->inst_state.cur_inst->primary_reg )
+        {
+            // LDH A, (n) instruction - Load from high memory into A
+            // Opcode: 0xF0
+            // Loads the contents of memory at address (0xFF00 + n) into register A
+            // Used to access hardware registers in Game Boy's memory map
+            SetRegister( ctx->inst_state.cur_inst->primary_reg, ReadBus( 0xFF00 | ctx->inst_state.fetched_data ) );
+        }
+    else
+        {
+            // LDH (n), A instruction - Store A into high memory
+            // Opcode: 0xE0
+            // Stores the contents of register A into memory at address (0xFF00 + n)
+            // Common usage is for hardware I/O registers like joypad, serial, timer controls
+            WriteBus( 0xFF00 | ctx->inst_state.fetched_data, ctx->regs.a );
+        }
+
+    AddEmulatorCycles( 1 );
+}
+
+/**
  * Mnemonic    : XOR
  * Instruction : Logical XOR
  * Function    : A = A ^ operand
@@ -220,7 +251,7 @@ ProcJP( CPUContext * cpu_ctx )
 static CPUInstructionProc PROCESSORS[] = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( XOR ),
+    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( LDH ), PROC( XOR ),
 #undef PROC
 
 };
