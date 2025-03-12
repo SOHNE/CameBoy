@@ -217,7 +217,7 @@ typedef uint64_t u64;
 #define IO_START                  0xFF00 /**< Start address of I/O registers */
 #define IO_END                    0xFF7F /**< End address of I/O registers */
 
-#define HRAM_SIZE                 0x7F   /**< Size of High RAM (HRAM) */
+#define HRAM_SIZE                 0x80   /**< Size of High RAM (HRAM) */
 #define HRAM_START                0xFF80 /**< Start address of High RAM */
 #define HRAM_END                  0xFFFE /**< End address of High RAM */
 
@@ -490,6 +490,14 @@ CCAPI void WriteBus( u16 addr, u8 value );
 
 CCAPI void WriteBus16( u16 address, u16 value );
 CCAPI u16  ReadBus16( u16 address );
+
+// RAM
+//------------------------------------------------------------------
+CCAPI u8   ReadWRAM( u16 addr );
+CCAPI void WriteWRAM( u16 addr, u8 value );
+
+CCAPI u8   ReadHRAM( u16 addr );
+CCAPI void WriteHRAM( u16 addr, u8 value );
 
 // Cart
 //------------------------------------------------------------------

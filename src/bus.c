@@ -76,17 +76,17 @@ ReadBus( u16 addr )
     else if( addr <= EXTRAM_END )
         {
             // Cartridge RAM (External RAM): 0xA000–0xBFFF
-            NO_IMPL();
+            return ReadCartridge( addr );
         }
     else if( addr <= WRAM_END )
         {
             // Work RAM (WRAM): 0xC000–0xDFFF
-            NO_IMPL();
+            return ReadWRAM( addr );
         }
     else if( addr <= ECHO_END )
         {
             // Echo RAM: 0xE000–0xFDFF
-            NO_IMPL();
+            return 0;
         }
     else if( addr <= OAM_END )
         {
@@ -106,7 +106,7 @@ ReadBus( u16 addr )
     else if( addr <= HRAM_END )
         {
             // High RAM (HRAM): 0xFF80–0xFFFE
-            NO_IMPL();
+            return ReadHRAM( addr );
         }
     else if( addr == IE_REGISTER )
         {
@@ -114,8 +114,6 @@ ReadBus( u16 addr )
             NO_IMPL();
         }
 
-    // High RAM (HRAM): 0xFF80–0xFFFE
-    NO_IMPL();
     return 0;
 }
 
@@ -128,8 +126,52 @@ WriteBus( u16 addr, u8 value )
             WriteCartridge( addr, value );
             return;
         }
-
-    LOG( LOG_ERROR, "UNSUPPORTED BusWrite %04X", addr );
+    else if( addr <= VRAM_END )
+        {
+            // Video RAM (VRAM): 0x8000–0x9FFF
+            NO_IMPL();
+        }
+    else if( addr <= EXTRAM_END )
+        {
+            // Cartridge RAM (External RAM): 0xA000–0xBFFF
+            WriteCartridge( addr, value );
+        }
+    else if( addr <= WRAM_END )
+        {
+            // Work RAM (WRAM): 0xC000–0xDFFF
+            WriteWRAM( addr, value );
+        }
+    else if( addr <= ECHO_END )
+        {
+            // Echo RAM: 0xE000–0xFDFF
+            return;
+        }
+    else if( addr <= OAM_END )
+        {
+            // Object Attribute Memory (OAM): 0xFE00–0xFE9F
+            NO_IMPL();
+        }
+    else if( addr <= 0xFEFF )
+        {
+            // Unusable / Reserved memory: 0xFEA0–0xFEFF
+            NO_IMPL();
+        }
+    else if( addr <= IO_END )
+        {
+            // I/O Registers: 0xFF00–0xFF7F
+            NO_IMPL();
+        }
+    else if( addr <= HRAM_END )
+        {
+            // High RAM (HRAM): 0xFF80–0xFFFE
+            WriteHRAM( addr, value );
+            return;
+        }
+    else if( addr == IE_REGISTER )
+        {
+            // Interrupt Enable Register: 0xFFFF
+            NO_IMPL();
+        }
 }
 
 u16
