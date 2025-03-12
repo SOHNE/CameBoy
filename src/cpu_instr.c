@@ -168,14 +168,6 @@ static Instruction instructions[0x100] = {
     [0xFA] = {  INS_LD, AM_R_A16,    RT_A, RT_NONE, CT_NONE, 0x00},
 };
 
-static char * inst_lookup[] = {
-    "<NONE>", "NOP",     "LD",      "INC",      "DEC",     "RLCA",    "ADD",     "RRCA",    "STOP",    "RLA",
-    "JR",     "RRA",     "DAA",     "CPL",      "SCF",     "CCF",     "HALT",    "ADC",     "SUB",     "SBC",
-    "AND",    "XOR",     "OR",      "CP",       "POP",     "JP",      "PUSH",    "RET",     "CB",      "CALL",
-    "RETI",   "LDH",     "JPHL",    "DI",       "EI",      "RST",     "INS_ERR", "INS_RLC", "INS_RRC", "INS_RL",
-    "INS_RR", "INS_SLA", "INS_SRA", "INS_SWAP", "INS_SRL", "INS_BIT", "INS_RES", "INS_SET",
-};
-
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definitions
 //----------------------------------------------------------------------------------------------------------------------
@@ -184,11 +176,4 @@ Instruction *
 GetInstructionByOpCode( u8 opcode )
 {
     return &instructions[opcode];
-}
-
-// Retrieve the instruction name by given `InsType`
-char *
-GetInstructionName( InsType t )
-{
-    return inst_lookup[t];
 }
