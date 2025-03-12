@@ -80,17 +80,18 @@
 
 // Runtime assertion
 #ifdef CC_DEBUG
-#    define ASSERT( cond )                                                                                             \
+#    define ASSERT( cond, msg, ... )                                                                                   \
         do                                                                                                             \
             {                                                                                                          \
                 if( !( cond ) )                                                                                        \
                     {                                                                                                  \
-                        TraceLog( LOG_FATAL, "%s:%d: Assertion `%s` failed", __FILE__, __LINE__, #cond );              \
+                        TraceLog( LOG_FATAL, "%s:%d: Assertion `%s` failed: " msg, __FILE__, __LINE__, #cond,          \
+                                  ##__VA_ARGS__ );                                                                     \
                     }                                                                                                  \
             }                                                                                                          \
         while( 0 )
 #else
-#    define ASSERT( cond ) ( (void)0 )
+#    define ASSERT( cond, msg, ... ) ( (void)0 )
 #endif
 
 #endif // !CAMECORE_UTILS_H
