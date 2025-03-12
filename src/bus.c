@@ -154,7 +154,7 @@ WriteBus( u16 addr, u8 value )
     else if( addr <= 0xFEFF )
         {
             // Unusable / Reserved memory: 0xFEA0–0xFEFF
-            NO_IMPL();
+            return;
         }
     else if( addr <= IO_END )
         {
