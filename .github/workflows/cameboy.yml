@@ -84,6 +84,7 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=Debug ^
                 -DCPM_SOURCE_CACHE=%CPM_SOURCE_CACHE% ^
+                -DCPM_USE_LOCAL_PACKAGES=ON ^
                 -DCMAKE_TOOLCHAIN_FILE="%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake" ^
                 ..\CameBoy
 
