@@ -1,4 +1,4 @@
-name: CameBoy
+name: CI Build
 
 on:
   workflow_dispatch:
@@ -20,10 +20,11 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 1
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
@@ -35,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: "**/cpm_modules"
-          key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+          key: ${{ github.workflow }}-cpm-modules-${{ matrix.os }}-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-cpm-
 
@@ -45,11 +46,26 @@ jobs:
         with:
           create-symlink: true
 
-      # --- Configure, build, and run ---
-      - name: Install dependencies
+      # --- Install dependencies based on OS ---
+      - name: Install dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install -y libsdl2-dev libfreetype6-dev libsdl2-ttf-dev
 
-      - name: Configure project with CMake
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install sdl2 freetype sdl2_ttf
+
+      - name: Install dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          vcpkg install sdl2:x64-windows sdl2-ttf:x64-windows freetype:x64-windows
+          echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" >> $env:GITHUB_ENV
+
+      # --- Configure with CMake based on OS ---
+      - name: Configure project with CMake (Linux/macOS)
+        if: matrix.os != 'windows-latest'
         run: |
           mkdir -p build && cd build
           cmake -DCMAKE_BUILD_TYPE=Debug \
@@ -58,5 +74,18 @@ jobs:
                 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
                 ../CameBoy
 
+      - name: Configure project with CMake (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug `
+                -DCPM_SOURCE_CACHE=$env:CPM_SOURCE_CACHE `
+                -DCMAKE_C_COMPILER_LAUNCHER=ccache `
+                -DCMAKE_CXX_COMPILER_LAUNCHER=ccache `
+                -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
+                ../CameBoy
+
+      # --- Build project ---
       - name: Build project
         run: cmake --build build -j4
