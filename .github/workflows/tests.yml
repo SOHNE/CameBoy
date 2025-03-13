@@ -1,4 +1,4 @@
-name: CameCore Tests
+name: Tests
 
 on:
   workflow_dispatch:
@@ -6,12 +6,12 @@ on:
     paths:
       - 'include/**'
       - 'src/**'
-      - '.github/workflows/camecore_tests.yml'
+      - '.github/workflows/tests.yml'
   pull_request:
     paths:
       - 'include/**'
       - 'src/**'
-      - '.github/workflows/camecore_tests.yml'
+      - '.github/workflows/tests.yml'
 
 env:
   CTEST_OUTPUT_ON_FAILURE: 1

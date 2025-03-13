@@ -7,13 +7,13 @@ on:
       - 'include/**'
       - 'src/**'
       - 'CameBoy/**'
-      - '.github/workflows/cameboy.yml'
+      - '.github/workflows/build.yml'
   pull_request:
     paths:
       - 'include/**'
       - 'src/**'
       - 'CameBoy/**'
-      - '.github/workflows/cameboy.yml'
+      - '.github/workflows/build.yml'
 
 env:
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
