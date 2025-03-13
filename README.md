@@ -7,8 +7,8 @@
 
 <!--[![GitHub release][release-badge]][release-link]-->
 [![License][license-badge]][license-link]
-[![CameCore][camecore-badge]][camecore-link]
-[![CameBoy][cameboy-badge]][cameboy-link]
+[![CI Build][build-badge]][build-link]
+[![Tests][tests-badge]][tests-link]
 
 ✨ Learning by doing: Exploring the fundamentals of emulation with a minimalist Game Boy™ project. 🎮
 
@@ -195,10 +195,11 @@ CameCore and CameBoy are licensed under zlib/libpng license, an OSI-certified an
 [release-link]: https://github.com/SOHNE/CameBoy/releases/latest
 [license-badge]: https://img.shields.io/github/license/SOHNE/CameBoy
 [license-link]: https://github.com/SOHNE/CameBoy/blob/main/LICENSE
-[camecore-badge]: https://github.com/SOHNE/CameBoy/actions/workflows/camecore.yml/badge.svg
-[camecore-link]: https://github.com/SOHNE/CameBoy/actions/workflows/camecore.yml
-[cameboy-badge]: https://github.com/SOHNE/CameBoy/actions/workflows/cameboy.yml/badge.svg
-[cameboy-link]: https://github.com/SOHNE/CameBoy/actions/workflows/cameboy.yml
+
+[build-badge]: https://github.com/SOHNE/CameBoy/actions/workflows/build.yml/badge.svg
+[build-link]: https://github.com/SOHNE/CameBoy/actions/workflows/build.yml
+[tests-badge]: https://github.com/SOHNE/CameBoy/actions/workflows/tests.yml/badge.svg
+[tests-link]: https://github.com/SOHNE/CameBoy/actions/workflows/tests.yml
 
 [CPM.cmake]: https://github.com/cpm-cmake
 [cameboy-cmake-file]: CameBoy/CMakeLists.txt#L21
