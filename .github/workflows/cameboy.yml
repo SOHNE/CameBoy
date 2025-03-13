@@ -41,10 +41,12 @@ jobs:
             ${{ runner.os }}-cpm-
 
       # --- Set up ccache via GitHub Action ---
-      - name: Set up ccache
+      - name: Set up ccache (Linux/macOS)
+        if: matrix.os != 'windows-latest'
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           create-symlink: true
+          key: ${{ github.workflow }}-ccache-${{ matrix.os }}
 
       # --- Install dependencies based on OS ---
       - name: Install dependencies (Ubuntu)
@@ -76,15 +78,14 @@ jobs:
 
       - name: Configure project with CMake (Windows)
         if: matrix.os == 'windows-latest'
+        shell: cmd
         run: |
-          mkdir -p build
+          mkdir build
           cd build
-          cmake -DCMAKE_BUILD_TYPE=Debug `
-                -DCPM_SOURCE_CACHE=$env:CPM_SOURCE_CACHE `
-                -DCMAKE_C_COMPILER_LAUNCHER=ccache `
-                -DCMAKE_CXX_COMPILER_LAUNCHER=ccache `
-                -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
-                ../CameBoy
+          cmake -DCMAKE_BUILD_TYPE=Debug ^
+                -DCPM_SOURCE_CACHE=%CPM_SOURCE_CACHE% ^
+                -DCMAKE_TOOLCHAIN_FILE="%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake" ^
+                ..\CameBoy
 
       # --- Build project ---
       - name: Build project
