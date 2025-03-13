@@ -63,11 +63,16 @@ extern char *             GetInstructionName( InsType t );         // Get the gi
 extern void FetchInstruction( void ); // Fetch next instruction
 extern void FetchData( void );        // Fetch current instruction data
 
+// Debug related
+extern void Disassemble( CPUContext * cpu_ctx, char * str );
+
 // CPU actions
 void CPUInit( void );
 bool CPUStep( void );
 
-extern void Disassemble( CPUContext * cpu_ctx, char * str );
+// Registers
+u8   GetIERegister( void );
+void SetIERegister( u8 v );
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Definitions
@@ -132,4 +137,18 @@ CPUStep( void )
         }
 
     return true;
+}
+
+// Get the Interrupt Enable(IE) register
+u8
+GetIERegister( void )
+{
+    return cpu_ctx.interupt_state.ie_reg;
+}
+
+// Set the Interrupt Enable(IE) register
+void
+SetIERegister( u8 v )
+{
+    cpu_ctx.interupt_state.ie_reg = v;
 }

@@ -58,6 +58,12 @@
 #include "camecore/utils.h"
 
 //----------------------------------------------------------------------------------------------------------------------
+// Functions Declarations
+//----------------------------------------------------------------------------------------------------------------------
+extern u8   GetIERegister( void );
+extern void SetIERegister( u8 v );
+
+//----------------------------------------------------------------------------------------------------------------------
 // Module Functions Definition
 //----------------------------------------------------------------------------------------------------------------------
 u8
@@ -111,7 +117,7 @@ ReadBus( u16 addr )
     else if( addr == IE_REGISTER )
         {
             // Interrupt Enable Register: 0xFFFF
-            NO_IMPL();
+            return GetIERegister();
         }
 
     return 0;
@@ -159,7 +165,7 @@ WriteBus( u16 addr, u8 value )
     else if( addr <= IO_END )
         {
             // I/O Registers: 0xFF00–0xFF7F
-            NO_IMPL();
+            LOG( LOG_ERROR, "IO not mapped [%04X]", value );
         }
     else if( addr <= HRAM_END )
         {
@@ -170,7 +176,7 @@ WriteBus( u16 addr, u8 value )
     else if( addr == IE_REGISTER )
         {
             // Interrupt Enable Register: 0xFFFF
-            NO_IMPL();
+            SetIERegister( value );
         }
 }
 
