@@ -23,22 +23,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Windows build temporarily disabled, will be set up manually later
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # --- Setup SDL using the setup-sdl action ---
-      - name: Setup SDL
-        id: sdl
-        uses: libsdl-org/setup-sdl@main
-        with:
-          install-linux-dependencies: true
-          version: 2-latest
-          version-sdl-ttf: 2-latest
 
       # --- Cache CPM modules ---
       - name: Cache CPM modules
@@ -57,18 +47,21 @@ jobs:
           create-symlink: true
           key: ${{ github.workflow }}-ccache-${{ matrix.os }}
 
-      # --- Install additional dependencies (if needed) ---
-      - name: Install additional dependencies (Ubuntu)
+      # --- Install SDL and additional dependencies (Ubuntu) ---
+      - name: Install SDL and additional dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install -y libfreetype6-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libfreetype6-dev
 
-      - name: Install additional dependencies (macOS)
+      # --- Install SDL and additional dependencies (macOS) ---
+      - name: Install SDL and additional dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
           brew update
-          brew install freetype
+          brew install sdl2 sdl2_ttf freetype
 
-      # Windows build steps commented out - will be set up manually later
+      # Windows build will be set up manually later
       # - name: Install dependencies (Windows)
       #   if: matrix.os == 'windows-latest'
       #   run: |
@@ -83,10 +76,9 @@ jobs:
                 -DCPM_SOURCE_CACHE=${CPM_SOURCE_CACHE} \
                 -DCMAKE_C_COMPILER_LAUNCHER=ccache \
                 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-                -DCMAKE_PREFIX_PATH=${{ steps.sdl.outputs.prefix }} \
                 ../CameBoy
 
-      # Windows CMake configuration commented out - will be set up manually later
+      # Windows CMake configuration will be set up manually later
       # - name: Configure project with CMake (Windows)
       #   if: matrix.os == 'windows-latest'
       #   shell: cmd
