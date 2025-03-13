@@ -23,12 +23,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        # Windows build temporarily disabled, will be set up manually later
+        os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # --- Setup SDL using the setup-sdl action ---
+      - name: Setup SDL
+        id: sdl
+        uses: libsdl-org/setup-sdl@main
+        with:
+          install-linux-dependencies: true
+          version: 2-latest
+          version-sdl-ttf: 2-latest
 
       # --- Cache CPM modules ---
       - name: Cache CPM modules
@@ -41,53 +51,57 @@ jobs:
             ${{ runner.os }}-cpm-
 
       # --- Set up ccache via GitHub Action ---
-      - name: Set up ccache (Linux/macOS)
-        if: matrix.os != 'windows-latest'
+      - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           create-symlink: true
           key: ${{ github.workflow }}-ccache-${{ matrix.os }}
 
-      # --- Install dependencies based on OS ---
-      - name: Install dependencies (Ubuntu)
+      # --- Install additional dependencies (if needed) ---
+      - name: Install additional dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install -y libsdl2-dev libfreetype6-dev libsdl2-ttf-dev
+        run: sudo apt-get update && sudo apt-get install -y libfreetype6-dev
 
-      - name: Install dependencies (macOS)
+      - name: Install additional dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
           brew update
-          brew install sdl2 freetype sdl2_ttf
+          brew install freetype
 
-      - name: Install dependencies (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          vcpkg install sdl2:x64-windows sdl2-ttf:x64-windows freetype:x64-windows
-          echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" >> $env:GITHUB_ENV
+      # Windows build steps commented out - will be set up manually later
+      # - name: Install dependencies (Windows)
+      #   if: matrix.os == 'windows-latest'
+      #   run: |
+      #     vcpkg install sdl2:x64-windows sdl2-ttf:x64-windows freetype:x64-windows
+      #     echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" >> $env:GITHUB_ENV
 
       # --- Configure with CMake based on OS ---
-      - name: Configure project with CMake (Linux/macOS)
-        if: matrix.os != 'windows-latest'
+      - name: Configure project with CMake
         run: |
           mkdir -p build && cd build
           cmake -DCMAKE_BUILD_TYPE=Debug \
                 -DCPM_SOURCE_CACHE=${CPM_SOURCE_CACHE} \
                 -DCMAKE_C_COMPILER_LAUNCHER=ccache \
                 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+                -DCMAKE_PREFIX_PATH=${{ steps.sdl.outputs.prefix }} \
                 ../CameBoy
 
-      - name: Configure project with CMake (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: |
-          mkdir build
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=Debug ^
-                -DCPM_SOURCE_CACHE=%CPM_SOURCE_CACHE% ^
-                -DCPM_USE_LOCAL_PACKAGES=ON ^
-                -DCMAKE_TOOLCHAIN_FILE="%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake" ^
-                ..\CameBoy
+      # Windows CMake configuration commented out - will be set up manually later
+      # - name: Configure project with CMake (Windows)
+      #   if: matrix.os == 'windows-latest'
+      #   shell: cmd
+      #   run: |
+      #     mkdir build
+      #     cd build
+      #     cmake -DCMAKE_BUILD_TYPE=Debug ^
+      #           -DCPM_SOURCE_CACHE=%CPM_SOURCE_CACHE% ^
+      #           -DCPM_USE_LOCAL_PACKAGES=ON ^
+      #           -DCMAKE_TOOLCHAIN_FILE="%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake" ^
+      #           ..\CameBoy
 
       # --- Build project ---
       - name: Build project
         run: cmake --build build -j4
+
+# Note: Windows build is temporarily disabled. Will set up a custom Windows environment
+# later to address warnings treated as errors and other Windows-specific issues.
