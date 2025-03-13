@@ -152,3 +152,10 @@ SetIERegister( u8 v )
 {
     cpu_ctx.interupt_state.ie_reg = v;
 }
+
+// Retrieve the CPU registers pointer
+CPURegisters *
+GetRegisters( void )
+{
+    return &cpu_ctx.regs;
+}

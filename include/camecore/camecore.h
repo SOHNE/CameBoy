@@ -153,8 +153,9 @@ typedef uint64_t u64;
 #define BIT_CHECK( r, n )         ( ( r ) & BIT( n ) )
 #define BIT_ASSIGN( r, n, v )     ( ( v ) ? BIT_SET( ( r ), ( n ) ) : BIT_CLEAR( ( r ), ( n ) ) )
 
-#define LOW_BYTE( val )           ( ( val ) & 0xFF )          /**< Get least significant byte */
-#define HIGH_BYTE( val )          ( ( ( val ) >> 8 ) & 0xFF ) /**< Get most significant byte */
+#define LOW_BYTE( val )           ( (u8)( ( val ) & 0xFFU ) )               /**< Extract LSB as 8-bit unsigned */
+#define HIGH_BYTE( val )          ( (u8)( ( (u16)( val ) >> 8 ) & 0xFFU ) ) /**< Extract MSB safely */
+#define MAKE_WORD( high, low )    ( (u16)( ( (u16)LOW_BYTE( high ) << 8 ) | LOW_BYTE( low ) ) ) /**< Make a 16-bit word */
 
 // Flags operation macros
 #define FLAG_SET( n, f )          ( ( n ) |= ( f ) )
@@ -482,6 +483,17 @@ CCAPI void AddEmulatorCycles( u32 cpu_cycles );
 CCAPI bool IsEmulatorRunning( void );
 
 CCAPI EmuContext * GetEmulatorContext( void );
+
+// CPU
+//------------------------------------------------------------------
+CCAPI u16            ReadRegister( RegType rt );
+CCAPI void           SetRegister( RegType rt, u16 val );
+CCAPI CPURegisters * GetRegisters( void );
+
+CCAPI void PushStack( u8 data );
+CCAPI void PushStackWord( u16 data );
+CCAPI u8   PopStack( void );
+CCAPI u16  PopStackWord( void );
 
 // Bus
 //------------------------------------------------------------------
