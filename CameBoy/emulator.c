@@ -1,5 +1,5 @@
 #include "emulator.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "camecore/camecore.h"
 #include "sdl_window.h"
 #ifdef __EMSCRIPTEN__

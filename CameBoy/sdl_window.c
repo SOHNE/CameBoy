@@ -1,5 +1,5 @@
 #include "sdl_window.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <stdio.h>
 
 static SDL_Window *   Window   = NULL;
