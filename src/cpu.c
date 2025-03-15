@@ -64,7 +64,7 @@ extern void FetchInstruction( void ); // Fetch next instruction
 extern void FetchData( void );        // Fetch current instruction data
 
 // Debug related
-extern void Disassemble( CPUContext * cpu_ctx, char * str );
+extern void Disassemble( CPUContext * cpu_ctx, char * str, size_t str_size );
 
 // CPU actions
 void CPUInit( void );
@@ -116,7 +116,7 @@ CPUStep( void )
                 const CPURegisters regs = cpu_ctx.regs;
 
                 char inst[16];
-                Disassemble( &cpu_ctx, inst );
+                Disassemble( &cpu_ctx, inst, sizeof( inst ) );
 
                 LOG( LOG_INFO,
                      "%08llX PC:%04X |"
