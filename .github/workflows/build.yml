@@ -35,7 +35,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --- Cache CPM modules ---
       - name: Cache CPM modules
         id: cache-cpm
         uses: actions/cache@v4
@@ -45,51 +44,29 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cpm-
 
-      # --- Set up ccache via GitHub Action ---
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           create-symlink: true
           key: ${{ github.workflow }}-ccache-${{ matrix.os }}
 
-      # --- Install static analyzers (Ubuntu) ---
-      - name: Install static analyzers (Ubuntu)
+      - name: Install dependencies, static analyzers, and sanitizers
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cppcheck clang-tidy iwyu
+          sudo apt-get install -y \
+            cppcheck clang-tidy iwyu \
+            libsdl2-dev libsdl2-ttf-dev libfreetype6-dev
 
-      # --- Install static analyzers (macOS) ---
-      - name: Install static analyzers (macOS)
+      - name: Install dependencies, static analyzers, and sanitizers
         if: matrix.os == 'macos-latest'
         run: |
           brew update
-          brew install cppcheck llvm
-          brew install include-what-you-use
+          brew install \
+            cppcheck llvm include-what-you-use \
+            sdl2 sdl2_ttf freetype
           echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
 
-      # --- Install SDL and additional dependencies (Ubuntu) ---
-      - name: Install SDL and additional dependencies (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libfreetype6-dev
-
-      # --- Install SDL and additional dependencies (macOS) ---
-      - name: Install SDL and additional dependencies (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew update
-          brew install sdl2 sdl2_ttf freetype
-
-      # Windows build will be set up manually later
-      # - name: Install dependencies (Windows)
-      #   if: matrix.os == 'windows-latest'
-      #   run: |
-      #     vcpkg install sdl2:x64-windows sdl2-ttf:x64-windows freetype:x64-windows
-      #     echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" >> $env:GITHUB_ENV
-
-      # --- Configure with CMake based on OS ---
       - name: Configure project with CMake
         run: |
           mkdir -p build && cd build
@@ -99,20 +76,7 @@ jobs:
                 -DUSE_CCACHE=YES \
                 ../CameBoy
 
-      # Windows CMake configuration will be set up manually later
-      # - name: Configure project with CMake (Windows)
-      #   if: matrix.os == 'windows-latest'
-      #   shell: cmd
-      #   run: |
-      #     mkdir build
-      #     cd build
-      #     cmake -DCMAKE_BUILD_TYPE=Debug ^
-      #           -DCPM_SOURCE_CACHE=%CPM_SOURCE_CACHE% ^
-      #           -DCPM_USE_LOCAL_PACKAGES=ON ^
-      #           -DCMAKE_TOOLCHAIN_FILE="%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake" ^
-      #           ..\CameBoy
-
-      # --- Build project ---
       - name: Build project
         run: cmake --build build -j4
+
 
