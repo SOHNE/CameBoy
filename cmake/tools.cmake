@@ -8,45 +8,60 @@ endif()
 # --------------------------------------------------------------------
 # Sanitizers
 # ------------------------------------------------------------------
-CPMAddPackage(
-  NAME sanitizers-cmake
-  URL https://github.com/arsenm/sanitizers-cmake/archive/refs/heads/master.zip
-)
+# Mandatory sanitizers when debugging
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(USE_STATIC_ANALYZER "cppcheck" CACHE STRING "Enable static analyzers in Debug mode" FORCE)
+  set(USE_SANITIZER "address;undefined" CACHE STRING "Enable sanitizers in Debug mode" FORCE)
+endif()
 
-# Configure sanitizers if the package was added successfully
-if(sanitizers-cmake_ADDED)
-  # Add sanitizers cmake modules to module path
-  list(PREPEND CMAKE_MODULE_PATH "${sanitizers-cmake_SOURCE_DIR}/cmake")
-
-  # Find sanitizers package
-  find_package(Sanitizers)
-
-  # Set default sanitizer options if not specified
-  if(NOT DEFINED SANITIZE_ADDRESS AND NOT DEFINED SANITIZE_MEMORY
-     AND NOT DEFINED SANITIZE_THREAD AND NOT DEFINED SANITIZE_UNDEFINED)
-    # Enable Address Sanitizer by default in Debug builds
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-      set(SANITIZE_ADDRESS ON CACHE BOOL "Enable Address Sanitizer")
+if(USE_SANITIZER OR USE_STATIC_ANALYZER)
+  CPMAddPackage("gh:StableCoder/cmake-scripts#24.04.1")
+  if(USE_SANITIZER)
+    include(${cmake-scripts_SOURCE_DIR}/sanitizers.cmake)
+  endif()
+  if(USE_STATIC_ANALYZER)
+    if("clang-tidy" IN_LIST USE_STATIC_ANALYZER)
+      set(CLANG_TIDY
+          ON
+          CACHE INTERNAL ""
+      )
+    else()
+      set(CLANG_TIDY
+          OFF
+          CACHE INTERNAL ""
+      )
+    endif()
+    if("iwyu" IN_LIST USE_STATIC_ANALYZER)
+      set(IWYU
+          ON
+          CACHE INTERNAL ""
+      )
+    else()
+      set(IWYU
+          OFF
+          CACHE INTERNAL ""
+      )
+    endif()
+    if("cppcheck" IN_LIST USE_STATIC_ANALYZER)
+      set(CPPCHECK
+          ON
+          CACHE INTERNAL ""
+      )
+    else()
+      set(CPPCHECK
+          OFF
+          CACHE INTERNAL ""
+      )
+    endif()
+    include(${cmake-scripts_SOURCE_DIR}/tools.cmake)
+    if(${CLANG_TIDY})
+      clang_tidy(${CLANG_TIDY_ARGS})
+    endif()
+    if(${IWYU})
+      include_what_you_use(${IWYU_ARGS})
+    endif()
+    if(${CPPCHECK})
+      cppcheck(${CPPCHECK_ARGS})
     endif()
   endif()
-
-  # sanitizer_add_blacklist_file("${CMAKE_SOURCE_DIR}/sanitizer_blacklist.txt")
-
-  # Helper function to add sanitizers to targets
-  function(add_target_sanitizers target)
-    if(NOT TARGET ${target})
-      message(WARNING "Target ${target} does not exist, cannot add sanitizers.")
-      return()
-    endif()
-
-    # Add sanitizers to the target
-    add_sanitizers(${target})
-
-    # If using Address Sanitizer, configure preload wrapper if needed
-    if(SANITIZE_ADDRESS AND ASan_WRAPPER)
-      set_target_properties(${target} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-        COMMAND ${ASan_WRAPPER} $<TARGET_FILE:${target}>)
-    endif()
-  endfunction()
 endif()

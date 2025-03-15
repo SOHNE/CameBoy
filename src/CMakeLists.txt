@@ -35,9 +35,6 @@ add_library(${PROJECT_NAME} ${CB_HEADER_FILES} ${CB_SOURCE_FILES})
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CB_DEPS_LINK})
 
-# Sanitizers
-add_sanitizers(${PROJECT_NAME})
-
 # Set compile flags
 target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<OR:$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>>:-Weverything>
