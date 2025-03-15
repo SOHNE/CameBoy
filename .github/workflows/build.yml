@@ -47,6 +47,22 @@ jobs:
           create-symlink: true
           key: ${{ github.workflow }}-ccache-${{ matrix.os }}
 
+      # --- Install static analyzers (Ubuntu) ---
+      - name: Install static analyzers (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck clang-tidy iwyu
+
+      # --- Install static analyzers (macOS) ---
+      - name: Install static analyzers (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install cppcheck llvm
+          brew install include-what-you-use
+          echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
+
       # --- Install SDL and additional dependencies (Ubuntu) ---
       - name: Install SDL and additional dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
@@ -75,7 +91,7 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Debug \
                 -DCPM_SOURCE_CACHE=${CPM_SOURCE_CACHE} \
                 -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-                -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+                -DUSE_CCACHE=YES \
                 ../CameBoy
 
       # Windows CMake configuration will be set up manually later
@@ -95,5 +111,3 @@ jobs:
       - name: Build project
         run: cmake --build build -j4
 
-# Note: Windows build is temporarily disabled. Will set up a custom Windows environment
-# later to address warnings treated as errors and other Windows-specific issues.
