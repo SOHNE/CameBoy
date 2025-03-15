@@ -165,7 +165,7 @@ WriteBus( u16 addr, u8 value )
     else if( addr <= IO_END )
         {
             // I/O Registers: 0xFF00–0xFF7F
-            LOG( LOG_ERROR, "IO not mapped [%04X]", value );
+            LOG( LOG_ERROR, "IO not mapped [%04X]", addr );
         }
     else if( addr <= HRAM_END )
         {
