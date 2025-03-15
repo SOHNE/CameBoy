@@ -181,16 +181,16 @@ WriteBus( u16 addr, u8 value )
 }
 
 u16
-ReadBus16( u16 address )
+ReadBusWord( u16 address )
 {
     u16 lo = ReadBus( address );
     u16 hi = ReadBus( address + 1 );
 
-    return (u16)( lo | ( hi << 8 ) );
+    return MAKE_WORD( hi, lo );
 }
 
 void
-WriteBus16( u16 address, u16 value )
+WriteBusWord( u16 address, u16 value )
 {
     WriteBus( address + 1, HIGH_BYTE( value ) );
     WriteBus( address, LOW_BYTE( value ) );

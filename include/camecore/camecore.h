@@ -500,8 +500,8 @@ CCAPI u16  PopStackWord( void );
 CCAPI u8   ReadBus( u16 addr );
 CCAPI void WriteBus( u16 addr, u8 value );
 
-CCAPI void WriteBus16( u16 address, u16 value );
-CCAPI u16  ReadBus16( u16 address );
+CCAPI void WriteBusWord( u16 address, u16 value );
+CCAPI u16  ReadBusWord( u16 address );
 
 // RAM
 //------------------------------------------------------------------

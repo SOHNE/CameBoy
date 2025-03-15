@@ -140,7 +140,7 @@ ProcLD( CPUContext * cpu_ctx )
                 {
                     // 16-bit register: add a cycle and write 16 bits
                     AddEmulatorCycles( 1 );
-                    WriteBus16( cpu_ctx->inst_state.mem_dest, cpu_ctx->inst_state.fetched_data );
+                    WriteBusWord( cpu_ctx->inst_state.mem_dest, cpu_ctx->inst_state.fetched_data );
                 }
             else
                 {
