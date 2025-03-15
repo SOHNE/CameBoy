@@ -23,11 +23,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 include(../cmake/CPM.cmake)
 include(../cmake/tools.cmake)
 
+set(PACKAGES "")
+
 CPMAddPackage(NAME CameCore SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+list(APPEND PACKAGES CameCore::CameCore)
+
 CPMAddPackage("gh:TheLartians/GroupSourcesByFolder.cmake@1.0")
 
 if(NOT DEFINED EMSCRIPTEN)
+  # --------------------------------------------------------------------
   # SDL
+  # --------------------------------------------------------------------
   find_package(SDL2 QUIET CONFIG COMPONENTS SDL2)
   find_package(SDL2 QUIET CONFIG COMPONENTS SDL2main)
 
@@ -41,7 +47,10 @@ if(NOT DEFINED EMSCRIPTEN)
       GIT_TAG release-2.32.0
       OPTIONS
         "SDL_EXAMPLES OFF"
+        "SDL_TEST_LIBRARY OFF"
+        "SDL_INSTALL_DOCS OFF"
         "SDL_TESTS OFF"
+        "SDL_VULKAN OFF"
     )
 
     if(NOT SDL_ADDED)
@@ -55,7 +64,15 @@ if(NOT DEFINED EMSCRIPTEN)
     message(STATUS "Found system SDL2")
   endif()
 
+  # Add SDL2
+  list(APPEND PACKAGES
+    $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+  )
+
+  # --------------------------------------------------------------------
   # SDL2_ttf
+  # --------------------------------------------------------------------
   find_package(SDL2_ttf QUIET)
 
   if(NOT SDL2_ttf_FOUND)
@@ -67,7 +84,8 @@ if(NOT DEFINED EMSCRIPTEN)
       GITHUB_REPOSITORY libsdl-org/SDL_ttf
       GIT_TAG release-2.24.0
       OPTIONS
-        "SDL_EXAMPLES OFF"
+        "SDLTTF_SAMPLES OFF"
+        "SDLTTF_PLUTOSVG OFF"
     )
 
     if(NOT SDL_ttf_ADDED)
@@ -81,7 +99,16 @@ if(NOT DEFINED EMSCRIPTEN)
     message(STATUS "Found system SDL2_ttf")
   endif()
 
+  # Add SDL2_ttf
+  list(APPEND PACKAGES
+    $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>
+  )
+
 endif()
+
+# --------------------------------------------------------------------
+# argparse
+# --------------------------------------------------------------------
 
 CPMAddPackage(
   NAME argparse
@@ -90,6 +117,12 @@ CPMAddPackage(
   OPTIONS
     "ARGPARSE_SHARED OFF"
 )
+
+if(NOT argparse_ADDED)
+  message(FATAL_ERROR "Failed to add cofyc/argparse package")
+endif()
+
+list(APPEND PACKAGES argparse)
 
 # --------------------------------------------------------------------
 # Testbed Setup
@@ -114,45 +147,38 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-      CameCore::CameCore
-      argparse
-      # SDL2
-      $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-      $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
-      # SDL2_ttf
-      $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>
+      ${PACKAGES}
 )
 
 # --------------------------------------------------------------------
 # Platform-Specific Configuration
 # --------------------------------------------------------------------
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
-    set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE true)
-    target_link_options(${PROJECT_NAME} PUBLIC -static -static-libgcc -static-libstdc++)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+  set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
+  set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE true)
+  target_link_options(${PROJECT_NAME} PUBLIC -static -static-libgcc -static-libstdc++)
 endif()
 
 if(EMSCRIPTEN)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --emrun -s USE_SDL=2 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s ALLOW_MEMORY_GROWTH")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
-    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "index")
+  set(USE_FLAGS "-s USE_SDL=2 -s USE_FREETYPE=1 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s ALLOW_MEMORY_GROWTH")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS}")
+  set(CMAKE_EXECUTABLE_SUFFIX .html)
 endif()
 
 if(APPLE)
-    list(APPEND APPLE_FRAMEWORKS
+  list(APPEND APPLE_FRAMEWORKS
         "-framework Cocoa"
         "-framework IOKit"
         "-framework CoreFoundation"
         "-framework CoreVideo"
     )
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${APPLE_FRAMEWORKS})
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${APPLE_FRAMEWORKS})
 endif()
 
 # --------------------------------------------------------------------
 # Source Grouping
 # --------------------------------------------------------------------
 GroupSourcesByFolder(${PROJECT_NAME})
-
 

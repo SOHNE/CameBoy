@@ -7,12 +7,17 @@ on:
       - 'include/**'
       - 'src/**'
       - 'CameBoy/**'
+      - 'CMakeOptions.cmake'
+      - 'cmake/**'
       - '.github/workflows/build.yml'
   pull_request:
     paths:
       - 'include/**'
       - 'src/**'
       - 'CameBoy/**'
+      - 'CMakeLists.txt'
+      - 'CMakeOptions.cmake'
+      - 'cmake/**'
       - '.github/workflows/build.yml'
 
 env:
