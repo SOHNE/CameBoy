@@ -23,6 +23,7 @@ list(APPEND CB_SOURCE_FILES
     ${CB_SOURCE_DIR}/cpu_proc.c
     ${CB_SOURCE_DIR}/cpu_util.c
     ${CB_SOURCE_DIR}/dissassemble.c
+    ${CB_SOURCE_DIR}/io.c
     ${CB_SOURCE_DIR}/ram.c
     ${CB_SOURCE_DIR}/stack.c
 )

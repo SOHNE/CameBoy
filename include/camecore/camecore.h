@@ -517,6 +517,11 @@ CCAPI bool LoadCartridge( char * cart );
 CCAPI u8   ReadCartridge( u16 address );
 CCAPI void WriteCartridge( u16 address, u8 value );
 
+// IO
+//------------------------------------------------------------------
+CCAPI u8   ReadIO( u16 addr );
+CCAPI void WriteIO( u16 addr, u8 value );
+
 // Utils
 //------------------------------------------------------------------
 CCAPI void TraceLog( i32 logLevel, const char * text, ... );
