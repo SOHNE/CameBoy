@@ -52,7 +52,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Logging Macros
 //----------------------------------------------------------------------------------------------------------------------
-#if defined( CC_DEBUG )
+#if defined( LOG_SUPPORT )
 #    define LOG( level, ... ) TraceLog( level, __VA_ARGS__ )
 
 #    if defined( SUPPORT_LOG_DEBUG )
@@ -92,6 +92,43 @@
         while( 0 )
 #else
 #    define ASSERT( cond, msg, ... ) ( (void)0 )
+#endif
+
+//----------------------------------------------------------------------------------------------------------------------
+// Threading
+//----------------------------------------------------------------------------------------------------------------------
+// Thread implementation
+#if defined( _WIN32 ) || defined( _WIN64 )
+#    include <windows.h>
+#    define THREAD_HANDLE                      HANDLE
+#    define THREAD_RETURN                      DWORD WINAPI
+#    define THREAD_PARAM                       LPVOID
+#    define THREAD_CREATE( handle, func, arg ) handle = CreateThread( NULL, 0, func, arg, 0, NULL )
+#    define THREAD_JOIN( handle )                                                                                      \
+        WaitForSingleObject( handle, INFINITE );                                                                       \
+        CloseHandle( handle )
+#    define THREAD_SLEEP( ms )     Sleep( ms )
+// Synchronization primitives
+#    define MUTEX_HANDLE           CRITICAL_SECTION
+#    define MUTEX_INIT( mutex )    InitializeCriticalSection( &mutex )
+#    define MUTEX_LOCK( mutex )    EnterCriticalSection( &mutex )
+#    define MUTEX_UNLOCK( mutex )  LeaveCriticalSection( &mutex )
+#    define MUTEX_DESTROY( mutex ) DeleteCriticalSection( &mutex )
+#else
+#    include <pthread.h>
+#    include <unistd.h>
+#    define THREAD_HANDLE                      pthread_t
+#    define THREAD_RETURN                      void *
+#    define THREAD_PARAM                       void *
+#    define THREAD_CREATE( handle, func, arg ) pthread_create( &handle, NULL, func, arg )
+#    define THREAD_JOIN( handle )              pthread_join( handle, NULL )
+#    define THREAD_SLEEP( ms )                 sleep( ms * 1000 )
+// Synchronization primitives
+#    define MUTEX_HANDLE                       pthread_mutex_t
+#    define MUTEX_INIT( mutex )                pthread_mutex_init( &mutex, NULL )
+#    define MUTEX_LOCK( mutex )                pthread_mutex_lock( &mutex )
+#    define MUTEX_UNLOCK( mutex )              pthread_mutex_unlock( &mutex )
+#    define MUTEX_DESTROY( mutex )             pthread_mutex_destroy( &mutex )
 #endif
 
 #endif // !CAMECORE_UTILS_H
