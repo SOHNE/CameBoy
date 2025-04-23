@@ -61,7 +61,9 @@ static char * RT_LOOKUP[] = {
 //----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Declarations
 //----------------------------------------------------------------------------------------------------------------------
-// ...
+char * GetInstructionName( InsType t );
+void   FormatInstructionBytes( CPUContext * cpu_ctx, char * bytes_str, size_t bytes_str_size );
+void   Disassemble( CPUContext * cpu_ctx, char * str, size_t str_size );
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Internal Functions Definitions
@@ -78,125 +80,116 @@ GetInstructionName( InsType t )
 }
 
 void
+FormatInstructionBytes( CPUContext * cpu_ctx, char * bytes_str, size_t bytes_str_size )
+{
+    char str[20];
+    u16  pc     = cpu_ctx->regs.pc;
+    u8   size   = cpu_ctx->inst_state.cur_inst->size;
+    u8   opcode = cpu_ctx->inst_state.cur_opcode;
+
+    if( size == 1 )
+        {
+            snprintf( str, sizeof( str ), "%02X", opcode );
+        }
+    else if( size == 2 )
+        {
+            snprintf( str, sizeof( str ), "%02X %02X", opcode, ReadBus( pc + 1 ) );
+        }
+    else if( size == 3 )
+        {
+            snprintf( str, sizeof( str ), "%02X %02X %02X", opcode, ReadBus( pc + 1 ), ReadBus( pc + 2 ) );
+        }
+    else
+        {
+            snprintf( str, sizeof( str ), "%02X ??", opcode );
+        }
+
+    snprintf( bytes_str, bytes_str_size, "%-8s", str );
+}
+
+void
 Disassemble( CPUContext * cpu_ctx, char * str, size_t str_size )
 {
+    char          bytes_str[16];
     Instruction * inst      = cpu_ctx->inst_state.cur_inst;
     const char *  inst_name = GetInstructionName( inst->type );
+    char          instruction[256];
+    u16           data     = cpu_ctx->inst_state.fetched_data;
+    u8            data_low = LOW_BYTE( data );
 
-    // Format the instruction based on its addressing mode
     switch( inst->addr_mode )
         {
-            case AM_IMP:
-                // Implicit addressing mode - just the instruction name
-                snprintf( str, str_size, "%s", inst_name );
-                break;
-
+            case AM_IMP: snprintf( instruction, sizeof( instruction ), "%s", inst_name ); break;
             case AM_R_D16:
             case AM_R_A16:
-                // Register with 16-bit immediate data/address
-                snprintf( str, str_size, "%s %s,$%04X", inst_name, RT_LOOKUP[inst->primary_reg],
-                          cpu_ctx->inst_state.fetched_data );
+                snprintf( instruction, sizeof( instruction ), "%s %s,$%04X", inst_name, RT_LOOKUP[inst->primary_reg],
+                          data );
                 break;
-
             case AM_R:
-                // Register operand only
-                snprintf( str, str_size, "%s %s", inst_name, RT_LOOKUP[inst->primary_reg] );
+                snprintf( instruction, sizeof( instruction ), "%s %s", inst_name, RT_LOOKUP[inst->primary_reg] );
                 break;
-
             case AM_R_R:
-                // Register to register
-                snprintf( str, str_size, "%s %s,%s", inst_name, RT_LOOKUP[inst->primary_reg],
+                snprintf( instruction, sizeof( instruction ), "%s %s,%s", inst_name, RT_LOOKUP[inst->primary_reg],
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             case AM_MR_R:
-                // Memory address in register to register
-                snprintf( str, str_size, "%s (%s),%s", inst_name, RT_LOOKUP[inst->primary_reg],
+                snprintf( instruction, sizeof( instruction ), "%s (%s),%s", inst_name, RT_LOOKUP[inst->primary_reg],
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             case AM_MR:
-                // Memory address in register
-                snprintf( str, str_size, "%s (%s)", inst_name, RT_LOOKUP[inst->primary_reg] );
+                snprintf( instruction, sizeof( instruction ), "%s (%s)", inst_name, RT_LOOKUP[inst->primary_reg] );
                 break;
-
             case AM_R_MR:
-                // Register to memory address in register
-                snprintf( str, str_size, "%s %s,(%s)", inst_name, RT_LOOKUP[inst->primary_reg],
+                snprintf( instruction, sizeof( instruction ), "%s %s,(%s)", inst_name, RT_LOOKUP[inst->primary_reg],
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             case AM_R_D8:
             case AM_R_A8:
-                // Register with 8-bit immediate data/address
-                snprintf( str, str_size, "%s %s,$%02X", inst_name, RT_LOOKUP[inst->primary_reg],
-                          cpu_ctx->inst_state.fetched_data & 0xFF );
+                snprintf( instruction, sizeof( instruction ), "%s %s,$%02X", inst_name, RT_LOOKUP[inst->primary_reg],
+                          data_low );
                 break;
-
             case AM_R_HLI:
-                // Register to memory address with post-increment
-                snprintf( str, str_size, "%s %s,(%s+)", inst_name, RT_LOOKUP[inst->primary_reg],
+                snprintf( instruction, sizeof( instruction ), "%s %s,(%s+)", inst_name, RT_LOOKUP[inst->primary_reg],
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             case AM_R_HLD:
-                // Register to memory address with post-decrement
-                snprintf( str, str_size, "%s %s,(%s-)", inst_name, RT_LOOKUP[inst->primary_reg],
+                snprintf( instruction, sizeof( instruction ), "%s %s,(%s-)", inst_name, RT_LOOKUP[inst->primary_reg],
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             case AM_HLI_R:
-                // Memory address with post-increment to register
-                snprintf( str, str_size, "%s (%s+),%s", inst_name, RT_LOOKUP[inst->primary_reg],
+                snprintf( instruction, sizeof( instruction ), "%s (%s+),%s", inst_name, RT_LOOKUP[inst->primary_reg],
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             case AM_HLD_R:
-                // Memory address with post-decrement to register
-                snprintf( str, str_size, "%s (%s-),%s", inst_name, RT_LOOKUP[inst->primary_reg],
+                snprintf( instruction, sizeof( instruction ), "%s (%s-),%s", inst_name, RT_LOOKUP[inst->primary_reg],
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             case AM_A8_R:
-                // 8-bit address to register
-                snprintf( str, str_size, "%s $%02X,%s", inst_name, ReadBus( cpu_ctx->regs.pc - 1 ),
+                snprintf( instruction, sizeof( instruction ), "%s $%02X,%s", inst_name, ReadBus( cpu_ctx->regs.pc - 1 ),
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             case AM_HL_SPR:
-                // HL register to stack pointer plus offset
-                snprintf( str, str_size, "%s (%s),SP+%d", inst_name, RT_LOOKUP[inst->primary_reg],
-                          cpu_ctx->inst_state.fetched_data & 0xFF );
+                snprintf( instruction, sizeof( instruction ), "%s (%s),SP+%d", inst_name, RT_LOOKUP[inst->primary_reg],
+                          data_low );
                 break;
-
-            case AM_D8:
-                // 8-bit immediate data
-                snprintf( str, str_size, "%s $%02X", inst_name, cpu_ctx->inst_state.fetched_data & 0xFF );
-                break;
-
-            case AM_D16:
-                // 16-bit immediate data
-                snprintf( str, str_size, "%s $%04X", inst_name, cpu_ctx->inst_state.fetched_data );
-                break;
-
+            case AM_D8:  snprintf( instruction, sizeof( instruction ), "%s $%02X", inst_name, data_low ); break;
+            case AM_D16: snprintf( instruction, sizeof( instruction ), "%s $%04X", inst_name, data ); break;
             case AM_D16_R:
-                // 16-bit immediate data to register
-                snprintf( str, str_size, "%s $%04X,%s", inst_name, cpu_ctx->inst_state.fetched_data,
+                snprintf( instruction, sizeof( instruction ), "%s $%04X,%s", inst_name, data,
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             case AM_MR_D8:
-                // Memory address in register with 8-bit immediate data
-                snprintf( str, str_size, "%s (%s),$%02X", inst_name, RT_LOOKUP[inst->primary_reg],
-                          cpu_ctx->inst_state.fetched_data & 0xFF );
+                snprintf( instruction, sizeof( instruction ), "%s (%s),$%02X", inst_name, RT_LOOKUP[inst->primary_reg],
+                          data_low );
                 break;
-
             case AM_A16_R:
-                // 16-bit address to register
-                snprintf( str, str_size, "%s ($%04X),%s", inst_name, cpu_ctx->inst_state.fetched_data,
+                snprintf( instruction, sizeof( instruction ), "%s ($%04X),%s", inst_name, data,
                           RT_LOOKUP[inst->secondary_reg] );
                 break;
-
             default: LOG( LOG_FATAL, "INVALID ADDRESSING MODE: %d", inst->addr_mode );
         }
+
+    FormatInstructionBytes( cpu_ctx, bytes_str, sizeof( bytes_str ) );
+    snprintf( str, str_size, "%-16s %-12s", instruction, bytes_str );
 }
+

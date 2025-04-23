@@ -35,15 +35,23 @@
  *
  *************************************************************************/
 
+#include <stdio.h>
 #include "camecore/camecore.h"
 #include "camecore/utils.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Defines and Macros
 //----------------------------------------------------------------------------------------------------------------------
+#define BOOT_ROM_START_ADDR 0x0100
+#define INITIAL_STACK_PTR   (short)0xFFFE
+#define INITIAL_AF          (short)0xB001
+#define INITIAL_BC          (short)0x1300
+#define INITIAL_DE          (short)0xD800
+#define INITIAL_HL          (short)0x4D01
+
 // Flag access
-#define GET_FLAG( flag )  BIT_CHECK( cpu_ctx.regs.f, FLAG_##flag##_BIT )
-#define FLAG_CHAR( flag ) ( GET_FLAG( flag ) ? #flag[0] : '-' )
+#define GET_FLAG( flag )    BIT_CHECK( cpu_ctx.regs.f, FLAG_##flag##_BIT )
+#define FLAG_CHAR( flag )   ( GET_FLAG( flag ) ? #flag[0] : '-' )
 
 //----------------------------------------------------------------------------------------------------------------------
 // Global Variables Definition
@@ -83,7 +91,7 @@ Execute( void )
 {
     CPUInstructionProc proc = GetInstructionProcessor( cpu_ctx.inst_state.cur_inst->type );
 
-    if( !proc )
+    if( UNLIKELY( NULL == proc ) )
         {
             NO_IMPL();
         }
@@ -98,44 +106,45 @@ Execute( void )
 void
 CPUInit( void )
 {
-    cpu_ctx.regs.pc = 0x100;
-    cpu_ctx.regs.a  = 0x01;
+    cpu_ctx.regs.pc               = BOOT_ROM_START_ADDR;
+    cpu_ctx.regs.sp               = INITIAL_STACK_PTR;
+    *( (short *)&cpu_ctx.regs.a ) = INITIAL_AF;
+    *( (short *)&cpu_ctx.regs.b ) = INITIAL_BC;
+    *( (short *)&cpu_ctx.regs.d ) = INITIAL_DE;
+    *( (short *)&cpu_ctx.regs.h ) = INITIAL_HL;
 }
 
 // Performs a single CPU step
 bool
 CPUStep( void )
 {
-    if( !cpu_ctx.status.halted )
+    if( false == cpu_ctx.status.halted )
         {
+            const u16 pc = cpu_ctx.regs.pc;
             FetchInstruction();
+            AddEmulatorCycles( 1 );
             FetchData();
 
             /** DEBUG */
             {
-                const CPURegisters regs = cpu_ctx.regs;
+                // First check if cur_inst is NULL before accessing any of its fields
+                if( UNLIKELY( NULL == cpu_ctx.inst_state.cur_inst ) )
+                    {
+                        LOG( LOG_FATAL, "Unknown Instruction! %02X\n", cpu_ctx.inst_state.cur_opcode );
+                        return false; // Return early since we can't execute a NULL instruction
+                    }
 
-                char inst[16];
+                char inst[32];        // Slightly larger buffer for safety
                 Disassemble( &cpu_ctx, inst, sizeof( inst ) );
 
-                LOG( LOG_INFO,
-                     "%08llX PC:%04X |"
-                     " %-12s | %02X %02X %02X |"
-                     " A:%02X F:%c%c%c%c | BC:%02X%02X DE:%02X%02X"
-                     " HL:%02X%02X",
-                     GetEmulatorContext()->ticks, regs.pc, inst, cpu_ctx.inst_state.cur_opcode, ReadBus( regs.pc + 1 ),
-                     ReadBus( regs.pc + 2 ), regs.a, FLAG_CHAR( Z ), FLAG_CHAR( N ), FLAG_CHAR( H ), FLAG_CHAR( C ),
-                     regs.b, regs.c, regs.d, regs.e, regs.h, regs.l );
+                LOG( LOG_INFO, "%08llX PC:%04X | %s | A:%02X F:%c%c%c%c | BC:%02X%02X DE:%02X%02X HL:%02X%02X",
+                     GetEmulatorContext()->ticks, pc, inst, cpu_ctx.regs.a, FLAG_CHAR( Z ), FLAG_CHAR( N ),
+                     FLAG_CHAR( H ), FLAG_CHAR( C ), cpu_ctx.regs.b, cpu_ctx.regs.c, cpu_ctx.regs.d, cpu_ctx.regs.e,
+                     cpu_ctx.regs.h, cpu_ctx.regs.l );
+
+                Execute();
             }
-
-            if( NULL == cpu_ctx.inst_state.cur_inst )
-                {
-                    LOG( LOG_FATAL, "Unknown Instruction! %02X\n", cpu_ctx.inst_state.cur_opcode );
-                }
-
-            Execute();
         }
-
     return true;
 }
 
