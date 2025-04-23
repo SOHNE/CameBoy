@@ -374,6 +374,8 @@ typedef struct Instruction
     RegType  secondary_reg;
     CondType condition_type;
     u8       param;
+    u8       cycles; // Duration in CPU cycles
+    u8       size;   // Size in bytes
 } Instruction;
 
 /**
@@ -476,13 +478,14 @@ CXX_GUARD_START
 
 // Core
 //------------------------------------------------------------------
-CCAPI void InitEmulator( void );
-CCAPI bool StepEmulator( void );
-CCAPI void AddEmulatorCycles( u32 cpu_cycles );
-
-CCAPI bool IsEmulatorRunning( void );
-
+CCAPI void         InitEmulator( void );
+CCAPI bool         StepEmulator( void );
+CCAPI void         AddEmulatorCycles( u32 cpu_cycles );
+CCAPI bool         IsEmulatorRunning( void );
 CCAPI EmuContext * GetEmulatorContext( void );
+CCAPI void         PauseEmulator( void );
+CCAPI void         ResumeEmulator( void );
+CCAPI void         StopEmulator( void );
 
 // CPU
 //------------------------------------------------------------------
