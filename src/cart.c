@@ -33,10 +33,10 @@
  *
  *************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
 #include "camecore/camecore.h"
 #include "camecore/utils.h"
+#include <stdio.h>
+#include <string.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // Module Defines and Macros
@@ -109,7 +109,7 @@ typedef struct PACKED CartContext
 // Global Variables Definition
 //----------------------------------------------------------------------------------------------------------------------
 // Cart state context
-CartContext cart_ctx = { 0 };
+CartContext cart_ctx            = { 0 };
 
 // Kind of hardware is present on the cartridge
 static const char * ROM_TYPES[] = {
@@ -244,7 +244,7 @@ GetCartLicenseeName( void )
 // NOTE: If the byte at $014D does not match the lower 8 bits of checksum,
 // the boot ROM will lock up and the program in the cartridge won’t run.
 static u16
-GetHeaderChecksum(void)
+GetHeaderChecksum( void )
 {
     u16 checksumCalc = 0;
 
@@ -263,10 +263,9 @@ GetHeaderChecksum(void)
 bool
 LoadCartridge( char * cartPath )
 {
-    size_t        bytesRead;
-    u8 *          fileData;
-    unsigned char calcChksum;
-    bool          chkValid;
+    size_t bytesRead;
+    u8 *   fileData;
+    bool   chkValid;
 
     if( false == IS_STR_VALID( cartPath ) )
         {
@@ -290,16 +289,15 @@ LoadCartridge( char * cartPath )
             return false;
         }
 
-    cart_ctx.rom.size = bytesRead;
-    cart_ctx.rom.data = fileData;
+    cart_ctx.rom.size   = bytesRead;
+    cart_ctx.rom.data   = fileData;
 
     // Setup header and null-terminate title
-    cart_ctx.rom.header = (RomHeader *)( ( (uintptr_t)cart_ctx.rom.data ) + HEADER_OFFSET );
+    cart_ctx.rom.header = (RomHeader *)( cart_ctx.rom.data + HEADER_OFFSET );
     cart_ctx.rom.header->title[sizeof( cart_ctx.rom.header->title ) - 1] = '\0';
 
     // Verify checksum
-    calcChksum = GetHeaderChecksum();
-    chkValid   = ( calcChksum == cart_ctx.rom.header->checksum );
+    chkValid = ( GetHeaderChecksum() == cart_ctx.rom.header->checksum );
 
     // Log cart info
     LOG( LOG_INFO, "Cartridge Loaded:" );
