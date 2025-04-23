@@ -54,22 +54,34 @@ extern void SetRegister( RegType rt, u16 val );
 // Module Internal Functions Definitions
 //----------------------------------------------------------------------------------------------------------------------
 // Return the check condition based on the given current instruction condition type
-static bool
+static INLINE bool
 CheckCondition( CPUContext * cpu_ctx )
 {
-    const bool z = GET_FLAG( Z );
-    const bool c = GET_FLAG( C );
-
     switch( cpu_ctx->inst_state.cur_inst->condition_type )
         {
             case CT_NONE: return true;
-            case CT_C:    return c;
-            case CT_NC:   return !c;
-            case CT_Z:    return z;
-            case CT_NZ:   return !z;
+            case CT_C:    return GET_FLAG( C );
+            case CT_NC:   return !GET_FLAG( C );
+            case CT_Z:    return GET_FLAG( Z );
+            case CT_NZ:   return !GET_FLAG( Z );
             default:      return false;
         }
     return false;
+}
+
+static INLINE void
+GoToAddress( CPUContext * cpu_ctx, u16 addr, bool pushpc )
+{
+    if( UNLIKELY( false == CheckCondition( cpu_ctx ) ) ) return;
+
+    if( pushpc )
+        {
+            AddEmulatorCycles( 2 );
+            PushStackWord( cpu_ctx->regs.pc );
+        }
+
+    cpu_ctx->regs.pc = addr;
+    AddEmulatorCycles( 1 );
 }
 
 // Instructions Implementation
@@ -128,12 +140,11 @@ ProcDI( CPUContext * cpu_ctx )
  * - - - -
  * (flags affected for specific LD operations)
  */
-// TODO: Fix the conversion loses at SetRegister
 static void
 ProcLD( CPUContext * cpu_ctx )
 {
     // If destination is memory, perform a memory write
-    if( true == cpu_ctx->inst_state.dest_is_mem )
+    if( LIKELY( true == cpu_ctx->inst_state.dest_is_mem ) )
         {
             // LD (destination), source
             if( RT_AF <= cpu_ctx->inst_state.cur_inst->secondary_reg )
@@ -151,7 +162,7 @@ ProcLD( CPUContext * cpu_ctx )
         }
 
     // Handle special case: HL = SP + r8 addressing mode
-    if( AM_HL_SPR == cpu_ctx->inst_state.cur_inst->addr_mode )
+    if( UNLIKELY( AM_HL_SPR == cpu_ctx->inst_state.cur_inst->addr_mode ) )
         {
             // Compute half-carry flag: if lower nibble sum is at least 0x10
             u8 hflag = ( 0x10 <= ( ( ( GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) & 0xF ) +
@@ -169,7 +180,7 @@ ProcLD( CPUContext * cpu_ctx )
 
             SetRegister( cpu_ctx->inst_state.cur_inst->primary_reg,
                          GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) +
-                             (char)cpu_ctx->inst_state.fetched_data );
+                             cpu_ctx->inst_state.fetched_data );
             return;
         }
 
@@ -238,17 +249,13 @@ ProcXOR( CPUContext * cpu_ctx )
 static void
 ProcJP( CPUContext * cpu_ctx )
 {
-    if( CheckCondition( cpu_ctx ) )
-        {
-            cpu_ctx->regs.pc = cpu_ctx->inst_state.fetched_data;
-            AddEmulatorCycles( 1 );
-        }
+    GoToAddress( cpu_ctx, cpu_ctx->inst_state.fetched_data, false );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // Processor Table
 //----------------------------------------------------------------------------------------------------------------------
-static CPUInstructionProc PROCESSORS[] = {
+static CPUInstructionProc PROCESSORS[] ALIGNED( 32 ) = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
     PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( LDH ), PROC( XOR ),
@@ -263,5 +270,7 @@ static CPUInstructionProc PROCESSORS[] = {
 CPUInstructionProc
 GetInstructionProcessor( InsType type )
 {
+    if( UNLIKELY( false == INDEX_VALID( type, PROCESSORS ) ) ) return ProcNONE;
+
     return PROCESSORS[type];
 }

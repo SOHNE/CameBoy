@@ -74,7 +74,7 @@ FETCH_LO_HI( u16 pc )
     hi = ReadBus( pc + 1 );
     AddEmulatorCycles( 1 );
 
-    return (u16)( lo | ( hi << 8 ) );
+    return MAKE_WORD( hi, lo );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -197,8 +197,7 @@ AM_Handler_HLD_R( void )
 static void
 AM_Handler_R_A8( void )
 {
-    u16 addr                        = ReadBus( cpu_ctx.regs.pc ) | 0xFF00;
-    cpu_ctx.inst_state.fetched_data = ReadBus( addr );
+    cpu_ctx.inst_state.fetched_data = ReadBus( cpu_ctx.regs.pc );
     AddEmulatorCycles( 1 );
     ++cpu_ctx.regs.pc;
 }
@@ -207,9 +206,8 @@ AM_Handler_R_A8( void )
 static void
 AM_Handler_A8_R( void )
 {
-    cpu_ctx.inst_state.mem_dest     = ReadBus( cpu_ctx.regs.pc ) | 0xFF00;
-    cpu_ctx.inst_state.dest_is_mem  = true;
-    cpu_ctx.inst_state.fetched_data = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
+    cpu_ctx.inst_state.mem_dest    = ReadBus( cpu_ctx.regs.pc ) | 0xFF00;
+    cpu_ctx.inst_state.dest_is_mem = true;
     AddEmulatorCycles( 1 );
     ++cpu_ctx.regs.pc;
 }
@@ -237,11 +235,10 @@ static void
 AM_Handler_A16_R( void )
 {
     u16 addr                         = FETCH_LO_HI( cpu_ctx.regs.pc );
-    cpu_ctx.regs.pc                 += 2;
-
     cpu_ctx.inst_state.mem_dest      = addr;
     cpu_ctx.inst_state.dest_is_mem   = true;
 
+    cpu_ctx.regs.pc                 += 2;
     cpu_ctx.inst_state.fetched_data  = GetRegister( cpu_ctx.inst_state.cur_inst->secondary_reg );
 }
 
@@ -326,13 +323,13 @@ FetchData( void )
     cpu_ctx.inst_state.mem_dest    = 0;
     cpu_ctx.inst_state.dest_is_mem = false;
 
-    if( NULL == cpu_ctx.inst_state.cur_inst ) return;
+    if( UNLIKELY( NULL == cpu_ctx.inst_state.cur_inst ) ) return;
 
     // Get addressing mode from current instruction
     AddrMode mode = cpu_ctx.inst_state.cur_inst->addr_mode;
 
     // Check if mode is valid
-    if( false == INDEX_VALID( mode, ADDRESS_MODE_HANDLERS ) )
+    if( UNLIKELY( false == INDEX_VALID( mode, ADDRESS_MODE_HANDLERS ) ) )
         {
             AM_Handler_UNKNOWN();
             return;

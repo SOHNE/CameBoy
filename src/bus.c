@@ -69,7 +69,7 @@ extern void SetIERegister( u8 v );
 u8
 ReadBus( u16 addr )
 {
-    if( addr <= ROM_BANKN_END )
+    if( LIKELY( addr <= ROM_BANKN_END ) )
         {
             // Cartridge ROM: 0x0000–0x7FFF
             return ReadCartridge( addr );
