@@ -14,7 +14,7 @@ static const char * const Usages[] = {
 int
 main( int argc, char * argv[] )
 {
-    const char * CartridgePath       = NULL;
+    char * CartridgePath       = NULL;
     int          Debug               = 0;
 
     struct argparse_option Options[] = {
@@ -41,8 +41,8 @@ main( int argc, char * argv[] )
         }
 
     // Setup the emulator
+    LoadCartridge( CartridgePath );
     InitEmulator();
-    LoadCartridge( (char *)CartridgePath );
 
     // Initialize window
     if( !InitSDLWindow( "CameBoy Emulator", 480, 432 ) )
@@ -56,6 +56,8 @@ main( int argc, char * argv[] )
 
     // Cleanup resources
     DestroySDLWindow();
+
+    //StopEmulator();
 
     return EXIT_SUCCESS;
 }
