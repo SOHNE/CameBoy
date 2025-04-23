@@ -33,14 +33,46 @@ list(APPEND CB_SOURCE_FILES
 #--------------------------------------------------------------------
 add_library(${PROJECT_NAME} ${CB_HEADER_FILES} ${CB_SOURCE_FILES})
 
-# Link libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CB_DEPS_LINK})
-
 # Set compile flags
 target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<OR:$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>>:-Weverything>
     $<$<C_COMPILER_ID:GNU>:-Wall -Wpedantic -Wextra -Werror -fdiagnostics-color=always>
     $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
+)
+
+#--------------------------------------------------------------------
+# Link libraries
+#--------------------------------------------------------------------
+if(WIN32)
+  set(THREAD_LIBRARIES "")
+else()
+  # Unix-like systems (Linux, macOS)
+  find_package(Threads REQUIRED)
+  set(THREAD_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+# Find libatomic if needed (mainly for GCC)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  find_library(ATOMIC_LIBRARY NAMES atomic atomic.so.1)
+  if(ATOMIC_LIBRARY)
+    set(ATOMIC_LIBRARIES ${ATOMIC_LIBRARY})
+  endif()
+endif()
+
+# Find math library
+if(NOT WIN32)
+  set(MATH_LIBRARIES m)
+endif()
+
+# Link all dependencies to your target
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  # System
+  ${MATH_LIBRARIES}
+  ${ATOMIC_LIBRARIES}
+  ${THREAD_LIBRARIES}
+
+  # CameCore
+  ${CB_DEPS_LINK}
 )
 
 #--------------------------------------------------------------------
@@ -83,6 +115,10 @@ if(BUILD_SHARED_LIBS)
   target_compile_definitions(${PROJECT_NAME} PUBLIC CC_SHARED_DEFINE)
 else()
   target_compile_definitions(${PROJECT_NAME} PUBLIC CC_STATIC_DEFINE)
+endif()
+
+if(LOG_SUPPORT)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC LOG_SUPPORT)
 endif()
 
 #--------------------------------------------------------------------
