@@ -120,7 +120,6 @@ CPUStep( void )
 {
     if( false == cpu_ctx.status.halted )
         {
-            const u16 pc = cpu_ctx.regs.pc;
             FetchInstruction();
             AddEmulatorCycles( 1 );
             FetchData();
@@ -128,6 +127,8 @@ CPUStep( void )
             /** DEBUG */
 #if defined( LOG_CPU_INSTR )
             {
+                const u16 pc = cpu_ctx.regs.pc;
+
                 // First check if cur_inst is NULL before accessing any of its fields
                 if( UNLIKELY( NULL == cpu_ctx.inst_state.cur_inst ) )
                     {
@@ -142,10 +143,10 @@ CPUStep( void )
                      GetEmulatorContext()->ticks, pc, inst, cpu_ctx.regs.a, FLAG_CHAR( Z ), FLAG_CHAR( N ),
                      FLAG_CHAR( H ), FLAG_CHAR( C ), cpu_ctx.regs.b, cpu_ctx.regs.c, cpu_ctx.regs.d, cpu_ctx.regs.e,
                      cpu_ctx.regs.h, cpu_ctx.regs.l );
-
-                Execute();
             }
 #endif
+
+            Execute();
         }
     return true;
 }
