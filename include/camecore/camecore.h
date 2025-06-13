@@ -489,7 +489,7 @@ CCAPI void         StopEmulator( void );
 
 // CPU
 //------------------------------------------------------------------
-CCAPI u16            ReadRegister( RegType rt );
+CCAPI u16            GetRegister( RegType rt );
 CCAPI void           SetRegister( RegType rt, u16 val );
 CCAPI CPURegisters * GetRegisters( void );
 
