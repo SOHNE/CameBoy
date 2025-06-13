@@ -59,12 +59,12 @@ CheckCondition( CPUContext * cpu_ctx )
 {
     switch( cpu_ctx->inst_state.cur_inst->condition_type )
         {
-            case CT_NONE: return true;
-            case CT_C:    return GET_FLAG( C );
-            case CT_NC:   return !GET_FLAG( C );
-            case CT_Z:    return GET_FLAG( Z );
-            case CT_NZ:   return !GET_FLAG( Z );
-            default:      return false;
+        case CT_NONE: return true;
+        case CT_C:    return GET_FLAG( C );
+        case CT_NC:   return !GET_FLAG( C );
+        case CT_Z:    return GET_FLAG( Z );
+        case CT_NZ:   return !GET_FLAG( Z );
+        default:      return false;
         }
     return false;
 }
@@ -165,12 +165,12 @@ ProcLD( CPUContext * cpu_ctx )
     if( UNLIKELY( AM_HL_SPR == cpu_ctx->inst_state.cur_inst->addr_mode ) )
         {
             // Compute half-carry flag: if lower nibble sum is at least 0x10
-            u8 hflag = ( 0x10 <= ( ( ( GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) & 0xF ) +
-                                     ( cpu_ctx->inst_state.fetched_data & 0xF ) ) ) );
+            u8 hflag = ( 0x10 <= ( ( ( GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) & 0xF )
+                                     + ( cpu_ctx->inst_state.fetched_data & 0xF ) ) ) );
 
             // Compute carry flag: if full byte sum is at least 0x100
-            u8 cflag = ( 0x100 <= ( ( ( GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) & 0xFF ) +
-                                      ( cpu_ctx->inst_state.fetched_data & 0xFF ) ) ) );
+            u8 cflag = ( 0x100 <= ( ( ( GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) & 0xFF )
+                                      + ( cpu_ctx->inst_state.fetched_data & 0xFF ) ) ) );
 
             // Set flags
             SET_FLAG( Z, 0 );
@@ -179,8 +179,8 @@ ProcLD( CPUContext * cpu_ctx )
             SET_FLAG( C, cflag );
 
             SetRegister( cpu_ctx->inst_state.cur_inst->primary_reg,
-                         GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) +
-                             cpu_ctx->inst_state.fetched_data );
+                         GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg )
+                             + cpu_ctx->inst_state.fetched_data );
             return;
         }
 
@@ -252,13 +252,75 @@ ProcJP( CPUContext * cpu_ctx )
     GoToAddress( cpu_ctx, cpu_ctx->inst_state.fetched_data, false );
 }
 
+/**
+ * Mnemonic    : POP
+ * Instruction : Pop from stack
+ * Function    : reg16 = [SP+1][SP], SP = SP + 2
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcPOP( CPUContext * cpu_ctx )
+{
+    u16 lo, hi, n;
+
+    lo = PopStack();
+    AddEmulatorCycles( 1 );
+
+    hi = PopStack();
+    AddEmulatorCycles( 1 );
+
+    // Combine bytes
+    n = MAKE_WORD( hi, lo );
+
+    // Store the popped value in the target register pair
+    SetRegister( cpu_ctx->inst_state.cur_inst->primary_reg, n );
+
+    // Special case
+    if( RT_AF == cpu_ctx->inst_state.cur_inst->primary_reg )
+        {
+            // AF register's lower 4 bits are always 0 (unused flag positions)
+            SetRegister( cpu_ctx->inst_state.cur_inst->primary_reg, n & 0xFFF0 );
+        }
+}
+
+/**
+ * Mnemonic    : PUSH
+ * Instruction : Push to stack
+ * Function    : SP = SP - 2, [SP+1] = reg16_hi, [SP] = reg16_lo
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcPUSH( CPUContext * cpu_ctx )
+{
+    u16 hi, lo;
+
+    // Get high byte of the register pair to push
+    hi = HIGH_BYTE( GetRegister( cpu_ctx->inst_state.cur_inst->primary_reg ) );
+    AddEmulatorCycles( 1 );
+
+    // Push high byte onto stack first
+    PushStack( hi );
+
+    // Get low byte of the register pair to push
+    lo = LOW_BYTE( GetRegister( cpu_ctx->inst_state.cur_inst->primary_reg ) );
+    AddEmulatorCycles( 1 );
+
+    // Push low byte onto stack
+    PushStack( lo );
+    AddEmulatorCycles( 1 );
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // Processor Table
 //----------------------------------------------------------------------------------------------------------------------
 static CPUInstructionProc PROCESSORS[] ALIGNED( 32 ) = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( LDH ), PROC( XOR ),
+    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( LDH ), PROC( XOR ), PROC( POP ), PROC( PUSH ),
 #undef PROC
 
 };
