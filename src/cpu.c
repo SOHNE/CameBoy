@@ -126,6 +126,7 @@ CPUStep( void )
             FetchData();
 
             /** DEBUG */
+#if defined( LOG_CPU_INSTR )
             {
                 // First check if cur_inst is NULL before accessing any of its fields
                 if( UNLIKELY( NULL == cpu_ctx.inst_state.cur_inst ) )
@@ -144,6 +145,7 @@ CPUStep( void )
 
                 Execute();
             }
+#endif
         }
     return true;
 }

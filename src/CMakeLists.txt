@@ -103,23 +103,22 @@ set_target_properties(${PROJECT_NAME}
 #--------------------------------------------------------------------
 # Compile definitions
 #--------------------------------------------------------------------
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_compile_definitions(${PROJECT_NAME} PUBLIC CC_DEBUG)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC SUPPORT_LOG_DEBUG)
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-  target_compile_definitions(${PROJECT_NAME} PUBLIC CC_RELEASE)
-endif()
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+    # Build Type
+    $<$<CONFIG:Debug>:CC_DEBUG>
+    $<$<CONFIG:Release>:CC_RELEASE>
 
-if(BUILD_SHARED_LIBS)
-  message(STATUS "Building shared library")
-  target_compile_definitions(${PROJECT_NAME} PUBLIC CC_SHARED_DEFINE)
-else()
-  target_compile_definitions(${PROJECT_NAME} PUBLIC CC_STATIC_DEFINE)
-endif()
+    # Debugging
+    $<$<CONFIG:Debug>:SUPPORT_LOG_DEBUG>
+    $<$<BOOL:${LOG_CPU_INSTR}>:LOG_CPU_INSTR>
 
-if(LOG_SUPPORT)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC LOG_SUPPORT)
-endif()
+    # Library Type
+    $<$<BOOL:${BUILD_SHARED_LIBS}>:CC_SHARED_DEFINE>
+    $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:CC_STATIC_DEFINE>
+
+    # Log Support
+    $<$<BOOL:${LOG_SUPPORT}>:LOG_SUPPORT>
+)
 
 #--------------------------------------------------------------------
 # Source Groups
