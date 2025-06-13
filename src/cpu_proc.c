@@ -253,6 +253,40 @@ ProcJP( CPUContext * cpu_ctx )
 }
 
 /**
+ * Mnemonic    : CALL
+ * Instruction : Call subroutine
+ * Function    : PC = address if condition is met
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcCALL( CPUContext * cpu_ctx )
+{
+    GoToAddress( cpu_ctx, cpu_ctx->inst_state.fetched_data, true );
+}
+
+/**
+ * Mnemonic    : JR
+ * Instruction : Jump relative
+ * Function    : PC = PC + signed_offset if condition is met
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcJR( CPUContext * cpu_ctx )
+{
+    // Cast fetched byte to signed char for relative addressing (range: -128 to +127)
+    char rel = (char)( LOW_BYTE( cpu_ctx->inst_state.fetched_data ) );
+
+    u16 addr = cpu_ctx->regs.pc + rel;
+
+    // Jump to relative address
+    GoToAddress( cpu_ctx, addr, false );
+}
+
+/**
  * Mnemonic    : POP
  * Instruction : Pop from stack
  * Function    : reg16 = [SP+1][SP], SP = SP + 2
@@ -320,7 +354,8 @@ ProcPUSH( CPUContext * cpu_ctx )
 static CPUInstructionProc PROCESSORS[] ALIGNED( 32 ) = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ), PROC( DI ), PROC( LDH ), PROC( XOR ), PROC( POP ), PROC( PUSH ),
+    PROC( NONE ), PROC( NOP ), PROC( LD ),  PROC( JP ),  PROC( CALL ), PROC( JR ),
+    PROC( DI ),   PROC( LDH ), PROC( XOR ), PROC( POP ), PROC( PUSH ),
 #undef PROC
 
 };
