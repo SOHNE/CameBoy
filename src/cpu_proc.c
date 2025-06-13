@@ -287,6 +287,57 @@ ProcJR( CPUContext * cpu_ctx )
 }
 
 /**
+ * Mnemonic    : RET
+ * Instruction : Return from subroutine
+ * Function    : PC = [SP+1][SP], SP = SP + 2 if condition is met
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcRET( CPUContext * cpu_ctx )
+{
+    // Checking condition takes time
+    if( CT_NONE != cpu_ctx->inst_state.cur_inst->condition_type )
+        {
+            AddEmulatorCycles( 1 );
+        }
+
+    if( CheckCondition( cpu_ctx ) )
+        {
+            u16 lo = PopStack();
+            AddEmulatorCycles( 1 );
+
+            u16 hi = PopStack();
+            AddEmulatorCycles( 1 );
+
+            u16 n            = MAKE_WORD( hi, lo );
+
+            // Set program counter to return address
+            cpu_ctx->regs.pc = n;
+            AddEmulatorCycles( 1 );
+        }
+}
+
+/**
+ * Mnemonic    : RETI
+ * Instruction : Return from interrupt
+ * Function    : IME = 1, PC = [SP+1][SP], SP = SP + 2
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcRETI( CPUContext * cpu_ctx )
+{
+    // Enable interrupt master enable flag
+    cpu_ctx->interupt_state.ime = true;
+
+    // Perform standard return operation
+    ProcRET( cpu_ctx );
+}
+
+/**
  * Mnemonic    : POP
  * Instruction : Pop from stack
  * Function    : reg16 = [SP+1][SP], SP = SP + 2
@@ -354,8 +405,8 @@ ProcPUSH( CPUContext * cpu_ctx )
 static CPUInstructionProc PROCESSORS[] ALIGNED( 32 ) = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-    PROC( NONE ), PROC( NOP ), PROC( LD ),  PROC( JP ),  PROC( CALL ), PROC( JR ),
-    PROC( DI ),   PROC( LDH ), PROC( XOR ), PROC( POP ), PROC( PUSH ),
+    PROC( NONE ), PROC( NOP ), PROC( LD ),  PROC( JP ),  PROC( CALL ), PROC( JR ),   PROC( RET ),
+    PROC( RETI ), PROC( DI ),  PROC( LDH ), PROC( XOR ), PROC( POP ),  PROC( PUSH ),
 #undef PROC
 
 };
