@@ -112,8 +112,10 @@ endif()
 
 CPMAddPackage(
   NAME argparse
-  GITHUB_REPOSITORY cofyc/argparse
-  GIT_TAG v1.1.0
+  #GITHUB_REPOSITORY cofyc/argparse
+  #GIT_TAG v1.1.0
+  #URL https://github.com/cofyc/argparse/archive/refs/heads/master.zip
+  URL https://github.com/cofyc/argparse/archive/5559200a91a334e15391e8285571145f6b6cc002.tar.gz
   OPTIONS
     "ARGPARSE_SHARED OFF"
 )
@@ -122,7 +124,7 @@ if(NOT argparse_ADDED)
   message(FATAL_ERROR "Failed to add cofyc/argparse package")
 endif()
 
-list(APPEND PACKAGES argparse)
+list(APPEND PACKAGES argparse_static)
 
 # --------------------------------------------------------------------
 # Testbed Setup
