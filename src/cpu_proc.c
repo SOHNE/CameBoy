@@ -280,7 +280,7 @@ ProcJR( CPUContext * cpu_ctx )
     // Cast fetched byte to signed char for relative addressing (range: -128 to +127)
     char rel = (char)( LOW_BYTE( cpu_ctx->inst_state.fetched_data ) );
 
-    u16 addr = cpu_ctx->regs.pc + rel;
+    u16 addr = (u16)( cpu_ctx->regs.pc + rel );
 
     // Jump to relative address
     GoToAddress( cpu_ctx, addr, false );
