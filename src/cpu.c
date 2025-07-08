@@ -43,7 +43,7 @@
 // Module Defines and Macros
 //----------------------------------------------------------------------------------------------------------------------
 #define BOOT_ROM_START_ADDR 0x0100
-#define INITIAL_STACK_PTR   (short)0xFFFE
+#define INITIAL_STACK_PTR   (unsigned short)0xFFFE
 #define INITIAL_AF          (short)0xB001
 #define INITIAL_BC          (short)0x1300
 #define INITIAL_DE          (short)0xD800
@@ -120,23 +120,15 @@ CPUStep( void )
 {
     if( false == cpu_ctx.status.halted )
         {
+            const u16 pc = cpu_ctx.regs.pc;
+
             FetchInstruction();
             AddEmulatorCycles( 1 );
             FetchData();
 
-            /** DEBUG */
 #if defined( LOG_CPU_INSTR )
             {
-                const u16 pc = cpu_ctx.regs.pc;
-
-                // First check if cur_inst is NULL before accessing any of its fields
-                if( UNLIKELY( NULL == cpu_ctx.inst_state.cur_inst ) )
-                    {
-                        LOG( LOG_FATAL, "Unknown Instruction! %02X\n", cpu_ctx.inst_state.cur_opcode );
-                        return false; // Return early since we can't execute a NULL instruction
-                    }
-
-                char inst[32];        // Slightly larger buffer for safety
+                char inst[32];
                 Disassemble( &cpu_ctx, inst, sizeof( inst ) );
 
                 LOG( LOG_INFO, "%08llX PC:%04X | %s | A:%02X F:%c%c%c%c | BC:%02X%02X DE:%02X%02X HL:%02X%02X",
@@ -145,6 +137,12 @@ CPUStep( void )
                      cpu_ctx.regs.h, cpu_ctx.regs.l );
             }
 #endif
+
+            if( UNLIKELY( NULL == cpu_ctx.inst_state.cur_inst ) )
+                {
+                    LOG( LOG_FATAL, "Unknown Instruction! %02X\n", cpu_ctx.inst_state.cur_opcode );
+                    return false;
+                }
 
             Execute();
         }
