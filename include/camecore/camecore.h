@@ -117,24 +117,24 @@ typedef uint64_t u64;
 #    define NORETURN      __attribute__( ( noreturn ) )
 #    define PACKED        __attribute__( ( packed ) )
 #    define INLINE        inline __attribute__( ( always_inline ) )
-#    define ALIGNED( x )  __attribute__( ( aligned( x ) ) ) // Align variables/structs
-#    define DEPRECATED    __attribute__( ( deprecated ) )   // Mark as deprecated
-#    define LIKELY( x )   __builtin_expect( !!( x ), 1 )    // Branch prediction hint
+#    define ALIGNED( x )  __attribute__( ( aligned( x ) ) )
+#    define DEPRECATED    __attribute__( ( deprecated ) )
+#    define LIKELY( x )   __builtin_expect( !!( x ), 1 )
 #    define UNLIKELY( x ) __builtin_expect( !!( x ), 0 )
-#elif defined( _MSC_VER )
-#    define NORETURN      __declspec( noreturn )
-#    define PACKED        __pragma( pack( push, 1 ) )
-#    define INLINE        __forceinline
-#    define ALIGNED( x )  __declspec( align( x ) )
-#    define DEPRECATED    __declspec( deprecated )
-#    define LIKELY( x )   ( x )
-#    define UNLIKELY( x ) ( x )
 #else
-#    define NORETURN
-#    define PACKED
-#    define INLINE inline
-#    define ALIGNED( x )
-#    define DEPRECATED
+#    ifdef _MSC_VER
+#        define NORETURN     __declspec( noreturn )
+#        define PACKED       __pragma( pack( push, 1 ) )
+#        define INLINE       __forceinline
+#        define ALIGNED( x ) __declspec( align( x ) )
+#        define DEPRECATED   __declspec( deprecated )
+#    else
+#        define NORETURN
+#        define PACKED
+#        define INLINE inline
+#        define ALIGNED( x )
+#        define DEPRECATED
+#    endif
 #    define LIKELY( x )   ( x )
 #    define UNLIKELY( x ) ( x )
 #endif
