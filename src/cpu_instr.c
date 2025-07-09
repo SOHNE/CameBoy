@@ -49,7 +49,8 @@ static Instruction instructions[0x100] = {
     [0x00] = {  INS_NOP,   AM_IMP, RT_NONE, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x01] = {   INS_LD, AM_R_D16,   RT_BC, RT_NONE, CT_NONE, 0x00, 12, 3 },
     [0x02] = {   INS_LD,  AM_MR_R,   RT_BC,    RT_A, CT_NONE, 0x00,  8, 1 },
-
+    [0x03] = {  INS_INC,     AM_R,   RT_BC, RT_NONE, CT_NONE, 0x00,  8, 1 },
+    [0x04] = {  INS_INC,     AM_R,    RT_B, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x05] = {  INS_DEC,     AM_R,    RT_B, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x06] = {   INS_LD,  AM_R_D8,    RT_B, RT_NONE, CT_NONE, 0x00,  8, 2 },
 
@@ -57,35 +58,45 @@ static Instruction instructions[0x100] = {
 
     [0x0A] = {   INS_LD,  AM_R_MR,    RT_A,   RT_BC, CT_NONE, 0x00,  8, 1 },
 
+    [0x0C] = {  INS_INC,     AM_R,    RT_C, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x0E] = {   INS_LD,  AM_R_D8,    RT_C, RT_NONE, CT_NONE, 0x00,  8, 2 },
 
     // 0x1X
     [0x11] = {   INS_LD, AM_R_D16,   RT_DE, RT_NONE, CT_NONE, 0x00, 12, 3 },
     [0x12] = {   INS_LD,  AM_MR_R,   RT_DE,    RT_A, CT_NONE, 0x00,  8, 1 },
+    [0x13] = {  INS_INC,     AM_R,   RT_DE, RT_NONE, CT_NONE, 0x00,  8, 1 },
+    [0x14] = {  INS_INC,     AM_R,    RT_D, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x15] = {  INS_DEC,     AM_R,    RT_D, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x16] = {   INS_LD,  AM_R_D8,    RT_D, RT_NONE, CT_NONE, 0x00,  8, 2 },
     [0x18] = {   INS_JR,    AM_D8, RT_NONE, RT_NONE, CT_NONE, 0x00,  2, 2 },
     [0x1A] = {   INS_LD,  AM_R_MR,    RT_A,   RT_DE, CT_NONE, 0x00,  8, 1 },
+    [0x1C] = {  INS_INC,     AM_R,    RT_E, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x1E] = {   INS_LD,  AM_R_D8,    RT_E, RT_NONE, CT_NONE, 0x00,  8, 2 },
 
     // 0x2X
     [0x20] = {   INS_JR,    AM_D8, RT_NONE, RT_NONE,   CT_NZ, 0x00,  2, 2 },
     [0x21] = {   INS_LD, AM_R_D16,   RT_HL, RT_NONE, CT_NONE, 0x00, 12, 3 },
     [0x22] = {   INS_LD, AM_HLI_R,   RT_HL,    RT_A, CT_NONE, 0x00,  8, 1 },
+    [0x23] = {  INS_INC,     AM_R,   RT_HL, RT_NONE, CT_NONE, 0x00,  8, 1 },
+    [0x24] = {  INS_INC,     AM_R,    RT_H, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x25] = {  INS_DEC,     AM_R,    RT_H, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x26] = {   INS_LD,  AM_R_D8,    RT_H, RT_NONE, CT_NONE, 0x00,  8, 2 },
     [0x28] = {   INS_JR,    AM_D8, RT_NONE, RT_NONE,    CT_Z, 0x00,  2, 2 },
     [0x2A] = {   INS_LD, AM_R_HLI,    RT_A,   RT_HL, CT_NONE, 0x00,  8, 1 },
+    [0x2C] = {  INS_INC,     AM_R,    RT_L, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x2E] = {   INS_LD,  AM_R_D8,    RT_L, RT_NONE, CT_NONE, 0x00,  8, 2 },
 
     // 0x3X
     [0x30] = {   INS_JR,    AM_D8, RT_NONE, RT_NONE,   CT_NC, 0x00,  2, 2 },
     [0x31] = {   INS_LD, AM_R_D16,   RT_SP, RT_NONE, CT_NONE, 0x00, 12, 3 },
     [0x32] = {   INS_LD, AM_HLD_R,   RT_HL,    RT_A, CT_NONE, 0x00,  8, 1 },
+    [0x33] = {  INS_INC,     AM_R,   RT_SP, RT_NONE, CT_NONE, 0x00,  8, 1 },
+    [0x34] = {  INS_INC,    AM_MR,   RT_HL, RT_NONE, CT_NONE, 0x00, 12, 1 },
     [0x35] = {  INS_DEC,     AM_R,   RT_HL, RT_NONE, CT_NONE, 0x00, 12, 1 },
     [0x36] = {   INS_LD, AM_MR_D8,   RT_HL, RT_NONE, CT_NONE, 0x00, 12, 2 },
     [0x38] = {   INS_JR,    AM_D8, RT_NONE, RT_NONE,    CT_C, 0x00,  2, 2 },
     [0x3A] = {   INS_LD, AM_R_HLD,    RT_A,   RT_HL, CT_NONE, 0x00,  8, 1 },
+    [0x3C] = {  INS_INC,     AM_R,    RT_A, RT_NONE, CT_NONE, 0x00,  4, 1 },
     [0x3E] = {   INS_LD,  AM_R_D8,    RT_A, RT_NONE, CT_NONE, 0x00,  8, 2 },
 
     // 0x4X

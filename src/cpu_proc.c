@@ -42,6 +42,8 @@
 #define GET_FLAG( flag )        BIT_CHECK( cpu_ctx->regs.f, FLAG_##flag##_BIT )
 #define SET_FLAG( flag, value ) BIT_ASSIGN( cpu_ctx->regs.f, FLAG_##flag##_BIT, value )
 
+#define IS_16_BIT( rt )         ( (bool)( RT_AF <= ( rt ) ) )
+
 //----------------------------------------------------------------------------------------------------------------------
 // Module Functions Declarations
 //----------------------------------------------------------------------------------------------------------------------
@@ -399,14 +401,60 @@ ProcPUSH( CPUContext * cpu_ctx )
     AddEmulatorCycles( 1 );
 }
 
+/**
+ * Mnemonic    : INC
+ * Instruction : Increment
+ * Function    : reg = reg + 1 (or [HL] = [HL] + 1 for memory addressing)
+ *
+ * (flags not affected for 16-bit registers ending in 0x03)
+ *
+ * Z N H C
+ * Z 0 H -
+ */
+static void
+ProcINC( CPUContext * cpu_ctx )
+{
+    // Calculate incremented value
+    u16 val = GetRegister( cpu_ctx->inst_state.cur_inst->primary_reg ) + 1;
+
+    // Add extra cycle for 16-bit register operations
+    if( IS_16_BIT( cpu_ctx->inst_state.cur_inst->primary_reg ) )
+        {
+            AddEmulatorCycles( 1 );
+        }
+
+    // Handle memory addressing mode (INC [HL])
+    if( RT_HL == cpu_ctx->inst_state.cur_inst->primary_reg && AM_MR == cpu_ctx->inst_state.cur_inst->addr_mode )
+        {
+            val = ReadBus( GetRegister( RT_HL ) ) + 1;
+            WriteBus( GetRegister( RT_HL ), LOW_BYTE( val ) );
+        }
+    else
+        {
+            SetRegister( cpu_ctx->inst_state.cur_inst->primary_reg, val );
+            val = GetRegister( cpu_ctx->inst_state.cur_inst->primary_reg );
+        }
+
+    // opcodes ending in 0x03 don't alter flags
+    if( ( cpu_ctx->inst_state.cur_opcode & 0x03 ) == 0x03 )
+        {
+            return;
+        }
+
+    // Set flags for 8-bit operations
+    SET_FLAG( Z, 0 == val );
+    SET_FLAG( N, 0 );
+    SET_FLAG( H, 0 == ( val & 0x0F ) );
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // Processor Table
 //----------------------------------------------------------------------------------------------------------------------
 static CPUInstructionProc PROCESSORS[] ALIGNED( 32 ) = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-    PROC( NONE ), PROC( NOP ), PROC( LD ),  PROC( JP ),  PROC( CALL ), PROC( JR ),   PROC( RET ),
-    PROC( RETI ), PROC( DI ),  PROC( LDH ), PROC( XOR ), PROC( POP ),  PROC( PUSH ),
+    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ),  PROC( CALL ), PROC( JR ),  PROC( RET ),
+    PROC( RETI ), PROC( INC ), PROC( DI ), PROC( LDH ), PROC( XOR ),  PROC( POP ), PROC( PUSH ),
 #undef PROC
 
 };
