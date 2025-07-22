@@ -241,6 +241,25 @@ ProcXOR( CPUContext * cpu_ctx )
 }
 
 /**
+ * Mnemonic    : OR
+ * Instruction : Logical OR
+ * Function    : A = A | operand
+ *
+ * Z N H C
+ * + 0 0 0
+ */
+static void
+ProcOR( CPUContext * cpu_ctx )
+{
+    cpu_ctx->regs.a |= LOW_BYTE( cpu_ctx->inst_state.fetched_data );
+
+    SET_FLAG( Z, cpu_ctx->regs.a == 0 );
+    SET_FLAG( N, 0 );
+    SET_FLAG( H, 0 );
+    SET_FLAG( C, 0 );
+}
+
+/**
  * Mnemonic    : JP
  * Instruction : Jump
  * Function    : PC = address if condition is met
@@ -453,8 +472,8 @@ ProcINC( CPUContext * cpu_ctx )
 static CPUInstructionProc PROCESSORS[] ALIGNED( 32 ) = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-    PROC( NONE ), PROC( NOP ), PROC( LD ), PROC( JP ),  PROC( CALL ), PROC( JR ),  PROC( RET ),
-    PROC( RETI ), PROC( INC ), PROC( DI ), PROC( LDH ), PROC( XOR ),  PROC( POP ), PROC( PUSH ),
+    PROC( NONE ), PROC( NOP ), PROC( LD ),  PROC( JP ), PROC( CALL ), PROC( JR ),  PROC( RET ),  PROC( RETI ),
+    PROC( INC ),  PROC( DI ),  PROC( LDH ), PROC( OR ), PROC( XOR ),  PROC( POP ), PROC( PUSH ),
 #undef PROC
 
 };
