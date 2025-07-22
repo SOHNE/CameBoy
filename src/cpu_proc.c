@@ -9,6 +9,21 @@
  *   - Implementations for several CPU instructions (e.g., NOP, DI, LD, XOR, JP).
  *   - A lookup table mapping instruction types to their corresponding processor functions.
  *
+ * -----
+ * FLAGS
+ * -----
+ *
+ * Z - Zero Flag
+ * N - Subtract Flag
+ * H - Half Carry Flag
+ * C - Carry Flag
+ * 0 - The flag is reset
+ * 1 - The flag is set
+ * - - The flag is left untouched
+ *
+ * If an operation has the flags defined as Z, N, H, or C,
+ * the corresponding flags are set as the operation performed dictates.
+ *
  *                               LICENSE
  * ------------------------------------------------------------------------
  * Copyright (c) 2025 SOHNE, Leandro Peres (@zschzen)
