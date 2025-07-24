@@ -135,6 +135,25 @@ ProcNOP( CPUContext * cpu_ctx )
 }
 
 /**
+ * Mnemonic    : CP
+ * Instruction : Compare
+ * Function    : A - operand
+ *
+ * Z N H C
+ * Z 1 H C
+ */
+static void
+ProcCP( CPUContext * cpu_ctx )
+{
+    int n = (int)cpu_ctx->regs.a - (int)cpu_ctx->inst_state.fetched_data;
+
+    SET_FLAG( Z, 0 == n );
+    SET_FLAG( N, 1 );
+    SET_FLAG( H, 0 > ( LOW_NIBBLE( cpu_ctx->regs.a ) - LOW_NIBBLE( cpu_ctx->inst_state.fetched_data ) ) );
+    SET_FLAG( C, 0 > n );
+}
+
+/**
  * Mnemonic    : DI
  * Instruction : Disable Interrupts
  * Function    : Disables interrupt master enable flag
@@ -487,8 +506,8 @@ ProcINC( CPUContext * cpu_ctx )
 static CPUInstructionProc PROCESSORS[] ALIGNED( 32 ) = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-    PROC( NONE ), PROC( NOP ), PROC( LD ),  PROC( JP ), PROC( CALL ), PROC( JR ),  PROC( RET ),  PROC( RETI ),
-    PROC( INC ),  PROC( DI ),  PROC( LDH ), PROC( OR ), PROC( XOR ),  PROC( POP ), PROC( PUSH ),
+    PROC( NONE ), PROC( NOP ), PROC( CP ), PROC( LD ),  PROC( JP ), PROC( CALL ), PROC( JR ),  PROC( RET ),
+    PROC( RETI ), PROC( INC ), PROC( DI ), PROC( LDH ), PROC( OR ), PROC( XOR ),  PROC( POP ), PROC( PUSH ),
 #undef PROC
 
 };
