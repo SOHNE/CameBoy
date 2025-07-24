@@ -9,20 +9,21 @@
  *   - Implementations for several CPU instructions (e.g., NOP, DI, LD, XOR, JP).
  *   - A lookup table mapping instruction types to their corresponding processor functions.
  *
- * -----
  * FLAGS
  * -----
  *
- * Z - Zero Flag
- * N - Subtract Flag
- * H - Half Carry Flag
- * C - Carry Flag
+ *  Z   N   H   C
+ * [7] [6] [5] [4] : Bit positions
+ *  |   |   |   |
+ *  |   |   |   +- Carry Flag
+ *  |   |   +----- Half Carry Flag
+ *  |   +--------- Subtract Flag
+ *  +------------- Zero Flag
+ *
  * 0 - The flag is reset
  * 1 - The flag is set
+ * + - The flag is set as the operation performed dictates
  * - - The flag is left untouched
- *
- * If an operation has the flags defined as Z, N, H, or C,
- * the corresponding flags are set as the operation performed dictates.
  *
  *                               LICENSE
  * ------------------------------------------------------------------------
@@ -140,7 +141,7 @@ ProcNOP( CPUContext * cpu_ctx )
  * Function    : A = A & operand
  *
  * Z N H C
- * Z 0 1 0
+ * + 0 1 0
  */
 static void
 ProcAND( CPUContext * cpu_ctx )
@@ -159,7 +160,7 @@ ProcAND( CPUContext * cpu_ctx )
  * Function    : A - operand
  *
  * Z N H C
- * Z 1 H C
+ * + 1 + +
  */
 static void
 ProcCP( CPUContext * cpu_ctx )
