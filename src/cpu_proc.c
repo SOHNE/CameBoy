@@ -135,6 +135,25 @@ ProcNOP( CPUContext * cpu_ctx )
 }
 
 /**
+ * Mnemonic    : AND
+ * Instruction : Logical AND
+ * Function    : A = A & operand
+ *
+ * Z N H C
+ * Z 0 1 0
+ */
+static void
+ProcAND( CPUContext * cpu_ctx )
+{
+    cpu_ctx->regs.a &= cpu_ctx->inst_state.fetched_data;
+
+    SET_FLAG( Z, 0 == cpu_ctx->regs.a );
+    SET_FLAG( N, 0 );
+    SET_FLAG( H, 1 );
+    SET_FLAG( C, 0 );
+}
+
+/**
  * Mnemonic    : CP
  * Instruction : Compare
  * Function    : A - operand
@@ -506,8 +525,9 @@ ProcINC( CPUContext * cpu_ctx )
 static CPUInstructionProc PROCESSORS[] ALIGNED( 32 ) = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-    PROC( NONE ), PROC( NOP ), PROC( CP ), PROC( LD ),  PROC( JP ), PROC( CALL ), PROC( JR ),  PROC( RET ),
-    PROC( RETI ), PROC( INC ), PROC( DI ), PROC( LDH ), PROC( OR ), PROC( XOR ),  PROC( POP ), PROC( PUSH ),
+    PROC( NONE ), PROC( NOP ), PROC( AND ), PROC( CP ),   PROC( LD ),   PROC( JP ),
+    PROC( CALL ), PROC( JR ),  PROC( RET ), PROC( RETI ), PROC( INC ),  PROC( DI ),
+    PROC( LDH ),  PROC( OR ),  PROC( XOR ), PROC( POP ),  PROC( PUSH ),
 #undef PROC
 
 };

@@ -172,6 +172,14 @@ static Instruction instructions[0x100] = {
     [0x7F] = {   INS_LD,   AM_R_R,    RT_A,    RT_A, CT_NONE, 0x00,  4, 1 },
 
     // 0xAX
+    [0xA0] = {  INS_AND,   AM_R_R,    RT_A,    RT_B, CT_NONE, 0x00,  4, 1 },
+    [0xA1] = {  INS_AND,   AM_R_R,    RT_A,    RT_C, CT_NONE, 0x00,  4, 1 },
+    [0xA2] = {  INS_AND,   AM_R_R,    RT_A,    RT_D, CT_NONE, 0x00,  4, 1 },
+    [0xA3] = {  INS_AND,   AM_R_R,    RT_A,    RT_E, CT_NONE, 0x00,  4, 1 },
+    [0xA4] = {  INS_AND,   AM_R_R,    RT_A,    RT_H, CT_NONE, 0x00,  4, 1 },
+    [0xA5] = {  INS_AND,   AM_R_R,    RT_A,    RT_L, CT_NONE, 0x00,  4, 1 },
+    [0xA6] = {  INS_AND,  AM_R_MR,    RT_A,   RT_HL, CT_NONE, 0x00,  8, 1 },
+    [0xA7] = {  INS_AND,   AM_R_R,    RT_A,    RT_A, CT_NONE, 0x00,  4, 1 },
     [0xAF] = {  INS_XOR,     AM_R,    RT_A, RT_NONE, CT_NONE, 0x00,  4, 1 },
 
     // 0xBX
@@ -221,6 +229,7 @@ static Instruction instructions[0x100] = {
     [0xE1] = {  INS_POP,   AM_IMP,   RT_HL, RT_NONE, CT_NONE, 0x00,  3, 1 },
     [0xE2] = {   INS_LD,  AM_MR_R,    RT_C,    RT_A, CT_NONE, 0x00,  8, 1 },
     [0xE5] = { INS_PUSH,   AM_IMP,   RT_HL, RT_NONE, CT_NONE, 0x00,  4, 1 },
+    [0xE6] = {  INS_AND,  AM_R_D8,    RT_A, RT_NONE, CT_NONE, 0x00,  8, 2 },
     [0xE9] = {   INS_JP,    AM_MR,   RT_HL, RT_NONE, CT_NONE, 0x00,  1, 1 },
     [0xEA] = {   INS_LD, AM_A16_R, RT_NONE,    RT_A, CT_NONE, 0x00, 16, 3 },
 
