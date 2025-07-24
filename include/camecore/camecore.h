@@ -157,6 +157,8 @@ typedef uint64_t u64;
 #define HIGH_BYTE( val )          ( (u8)( ( (u16)( val ) >> 8 ) & 0xFFU ) ) /**< Extract MSB safely */
 #define MAKE_WORD( high, low )    ( (u16)( ( (u16)LOW_BYTE( high ) << 8 ) | LOW_BYTE( low ) ) ) /**< Make a 16-bit word */
 
+#define LOW_NIBBLE( val )         ( (u8)( ( val ) & 0x0FU ) ) /**< Extract low 4 bits */
+
 // Flags operation macros
 #define FLAG_SET( n, f )          ( ( n ) |= ( f ) )
 #define FLAG_CLEAR( n, f )        ( ( n ) &= ~( f ) )
