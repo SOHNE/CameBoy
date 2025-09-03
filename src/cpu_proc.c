@@ -342,6 +342,20 @@ ProcCALL( CPUContext * cpu_ctx )
 }
 
 /**
+ * Mnemonic    : RST
+ * Instruction : Restart (call fixed address)
+ * Function    : Push PC to stack, then jump to fixed address (00H + n)
+ *
+ * Z N H C
+ * - - - -
+ */
+static void
+ProcRST( CPUContext * cpu_ctx )
+{
+    GoToAddress( cpu_ctx, cpu_ctx->inst_state.cur_inst->param, true );
+}
+
+/**
  * Mnemonic    : JR
  * Instruction : Jump relative
  * Function    : PC = PC + signed_offset if condition is met
@@ -526,9 +540,9 @@ ProcINC( CPUContext * cpu_ctx )
 static CPUInstructionProc PROCESSORS[] ALIGNED( 32 ) = {
 
 #define PROC( mnemonic ) [INS_##mnemonic] = Proc##mnemonic
-    PROC( NONE ), PROC( NOP ), PROC( AND ), PROC( CP ),   PROC( LD ),   PROC( JP ),
-    PROC( CALL ), PROC( JR ),  PROC( RET ), PROC( RETI ), PROC( INC ),  PROC( DI ),
-    PROC( LDH ),  PROC( OR ),  PROC( XOR ), PROC( POP ),  PROC( PUSH ),
+    PROC( NONE ), PROC( NOP ), PROC( AND ), PROC( CP ),  PROC( LD ),   PROC( JP ),
+    PROC( CALL ), PROC( JR ),  PROC( RET ), PROC( RST ), PROC( RETI ), PROC( INC ),
+    PROC( DI ),   PROC( LDH ), PROC( OR ),  PROC( XOR ), PROC( POP ),  PROC( PUSH ),
 #undef PROC
 
 };
