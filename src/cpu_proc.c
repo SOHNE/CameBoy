@@ -90,7 +90,7 @@ CheckCondition( CPUContext * cpu_ctx )
 static INLINE void
 GoToAddress( CPUContext * cpu_ctx, u16 addr, bool pushpc )
 {
-    if( UNLIKELY( false == CheckCondition( cpu_ctx ) ) ) return;
+    if( !CheckCondition( cpu_ctx ) ) return;
 
     if( pushpc )
         {
@@ -200,7 +200,7 @@ static void
 ProcLD( CPUContext * cpu_ctx )
 {
     // If destination is memory, perform a memory write
-    if( LIKELY( true == cpu_ctx->inst_state.dest_is_mem ) )
+    if( cpu_ctx->inst_state.dest_is_mem )
         {
             // LD (destination), source
             if( RT_AF <= cpu_ctx->inst_state.cur_inst->secondary_reg )
@@ -218,7 +218,7 @@ ProcLD( CPUContext * cpu_ctx )
         }
 
     // Handle special case: HL = SP + r8 addressing mode
-    if( UNLIKELY( AM_HL_SPR == cpu_ctx->inst_state.cur_inst->addr_mode ) )
+    if( AM_HL_SPR == cpu_ctx->inst_state.cur_inst->addr_mode )
         {
             // Compute half-carry flag: if lower nibble sum is at least 0x10
             u8 hflag = ( 0x10 <= ( ( ( GetRegister( cpu_ctx->inst_state.cur_inst->secondary_reg ) & 0xF )
