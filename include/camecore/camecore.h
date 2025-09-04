@@ -178,7 +178,7 @@ typedef uint64_t u64;
 #define FLAG_C                    BIT( FLAG_C_BIT )
 
 // Array
-#define ARRAY_LEN( a )            ( sizeof( ( a ) ) / sizeof( ( a )[0] ) )
+#define ARRAY_LEN( a )            ( (int)( sizeof( a ) / sizeof( *a ) ) )
 #define INDEX_VALID( i, a )       ( ( i ) >= 0 && (size_t)( i ) < ARRAY_LEN( a ) )
 
 // Memory ranges
